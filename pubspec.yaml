@@ -1,0 +1,15 @@
+name: aha_client
+description: Dart client for the AVM Home Automation HTTP Interface + Login.
+version: 1.0.0
+homepage: https://github.com/Skycoder42/aha-dart
+
+environment:
+  sdk: '>=2.13.0 <3.0.0'
+
+# dependencies:
+#   path: ^1.8.0
+
+dev_dependencies:
+  lint: ^1.6.0
+  test: ^1.16.0
+
