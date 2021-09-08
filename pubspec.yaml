@@ -8,10 +8,14 @@ environment:
 
 dependencies:
   chopper: ^4.0.1
+  freezed_annotation: ^0.14.3
+  meta: ^1.7.0
+  xml: ^5.2.0
 
 dev_dependencies:
   build_runner: ^2.1.2
   chopper_generator: ^4.0.1
+  freezed: ^0.14.2
   lint: ^1.6.0
   test: ^1.16.0
 
