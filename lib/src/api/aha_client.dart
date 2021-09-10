@@ -1,7 +1,9 @@
-import 'package:aha_client/src/api/login_service.dart';
-import 'package:aha_client/src/api/models/session_info.dart';
-import 'package:aha_client/src/api/xml_typed_converter.dart';
 import 'package:chopper/chopper.dart';
+
+import 'aha_service.dart';
+import 'login/login_service.dart';
+import 'login/models/session_info.dart';
+import 'xml_typed_converter.dart';
 
 class AhaClient {
   static const defaultHostName = 'fritz.box';
@@ -21,10 +23,13 @@ class AhaClient {
             ..registerConverter<SessionInfo>(SessionInfo.converter),
           services: [
             LoginService.create(),
+            AhaService.create(),
           ],
         );
 
   void dispose() => _client.dispose();
 
   LoginService get login => _client.getService();
+
+  AhaService get aha => _client.getService();
 }

@@ -7,6 +7,7 @@ part 'user.freezed.dart';
 class User with _$User {
   const User._();
 
+  // ignore: sort_unnamed_constructors_first
   const factory User(
     String user, {
     @Default(false) bool last,

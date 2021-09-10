@@ -24,8 +24,12 @@ Future<void> main() async {
   final client = AhaClient();
 
   final response = await client.login.getLoginStatus();
-
   print(response.body);
+
+  final response2 = await client.aha.get('getdevicelistinfos');
+  print(response2.statusCode);
+  print(response2.headers);
+  print(response2.bodyString);
 
   client.dispose();
 }
