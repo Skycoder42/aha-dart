@@ -1,3 +1,4 @@
+import 'package:aha_client/src/api/login/login_manager.dart';
 import 'package:chopper/chopper.dart';
 
 import 'aha_service.dart';
@@ -10,9 +11,12 @@ class AhaClient {
 
   final ChopperClient _client;
 
+  final LoginManager loginManager;
+
   AhaClient({
     String hostName = defaultHostName,
     int? port,
+    required this.loginManager,
   }) : _client = ChopperClient(
           baseUrl: Uri(
             scheme: 'https',
@@ -21,11 +25,17 @@ class AhaClient {
           ).toString(),
           converter: XmlTypedConverter()
             ..registerConverter<SessionInfo>(SessionInfo.converter),
+          interceptors: [
+            loginManager,
+          ],
+          authenticator: loginManager,
           services: [
             LoginService.create(),
             AhaService.create(),
           ],
-        );
+        ) {
+    loginManager.linkToClient(_client);
+  }
 
   void dispose() => _client.dispose();
 

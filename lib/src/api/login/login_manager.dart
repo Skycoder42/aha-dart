@@ -28,13 +28,25 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
   List<Right> get rights => _rights;
 
-  // ignore: use_setters_to_change_properties
-  @internal
-  void linkToClient(ChopperClient client) {
-    _client = client;
+  String get sid => _sid;
+  set sid(String sid) {
+    if (sid.length != 16) {
+      // TODO validate with regexp
+      throw ArgumentError.value(
+        sid,
+        'sid',
+        'must be a 64 bit hex encoded integer',
+      );
+    }
+
+    _sid = sid;
   }
 
+  @protected
+  FutureOr<UserCredentials> obtainCredentials(List<User> knownUsers);
+
   @override
+  @internal
   FutureOr<Request> onRequest(Request request) async {
     if (request.isLogin) {
       return request;
@@ -48,6 +60,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
   }
 
   @override
+  @internal
   FutureOr<Request?> authenticate(Request request, Response response) async {
     if (response.statusCode != 403 || request.isLogin) {
       return null;
@@ -57,8 +70,11 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     return _copyRequestWithSid(request);
   }
 
-  @protected
-  FutureOr<UserCredentials> obtainCredentials(List<User> knownUsers);
+  @internal
+  // ignore: use_setters_to_change_properties
+  void linkToClient(ChopperClient client) {
+    _client = client;
+  }
 
   Request _copyRequestWithSid(Request request) => request.copyWith(parameters: {
         ...request.parameters,
