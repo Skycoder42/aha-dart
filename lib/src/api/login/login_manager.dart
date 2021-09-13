@@ -42,6 +42,8 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     _sid = sid;
   }
 
+  Future<void> login() => _performLogin();
+
   @protected
   FutureOr<UserCredentials> obtainCredentials(List<User> knownUsers);
 

@@ -12,5 +12,5 @@ abstract class AhaService extends ChopperService {
   Future<Response<String>> getSwitchName(@Query() String ain);
 
   @Get(path: '$_baseUrl?switchcmd=getdevicelistinfos')
-  Future<Response> getDeviceListInfos();
+  Future<Response<Object>> getDeviceListInfos();
 }

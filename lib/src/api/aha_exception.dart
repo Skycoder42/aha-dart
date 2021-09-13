@@ -10,7 +10,7 @@ class AhaException implements Exception {
   String toString() => 'Request failed ($statusCode): $error';
 }
 
-extension AhaExceptionX<TBody extends Object> on Response<TBody> {
+extension AhaExceptionResponseX<TBody extends Object> on Response<TBody> {
   TBody get value {
     if (!isSuccessful || body == null) {
       throw AhaException(statusCode, error ?? bodyString);
@@ -18,4 +18,9 @@ extension AhaExceptionX<TBody extends Object> on Response<TBody> {
 
     return body!;
   }
+}
+
+extension AhaExceptionFutureResponseX<TBody extends Object>
+    on Future<Response<TBody>> {
+  Future<TBody> get value => then((response) => response.value);
 }
