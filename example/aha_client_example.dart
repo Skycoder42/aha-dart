@@ -30,7 +30,7 @@ class ExampleLoginManager extends LoginManager {
     final username = stdin.readLineSync()!;
     stdout.write('Password: ');
     await stdout.flush();
-    // stdin.echoMode = false;
+    stdin.echoMode = false;
     final password = stdin.readLineSync()!;
     stdin.echoMode = true;
     return UserCredentials(username: username, password: password);
