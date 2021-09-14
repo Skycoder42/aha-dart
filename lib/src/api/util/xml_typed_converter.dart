@@ -1,19 +1,20 @@
 import 'dart:async';
 
-import 'package:aha_client/src/api/xml_converter.dart';
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
-abstract class TypeConverter<T> {
-  const TypeConverter._();
+import 'xml_converter.dart';
+
+abstract class XmlTypeConverter<T> {
+  const XmlTypeConverter._();
 
   XmlDocument toXml(T data);
   T fromXml(XmlDocument xml);
 }
 
-abstract class SimpleTypeConverter<T> implements TypeConverter<T> {
-  const SimpleTypeConverter();
+abstract class SimpleXmlTypeConverter<T> implements XmlTypeConverter<T> {
+  const SimpleXmlTypeConverter();
 
   @override
   T fromXml(XmlDocument xml) => parseXml(xml.rootElement);
@@ -35,15 +36,15 @@ abstract class SimpleTypeConverter<T> implements TypeConverter<T> {
 class XmlTypedConverter extends Converter {
   final _xmlConverter = XmlConverter();
 
-  final _typeConverters = <Type, TypeConverter>{};
+  final _typeConverters = <Type, XmlTypeConverter>{};
 
-  void registerConverter<T>(TypeConverter<T> converter) =>
+  void registerConverter<T>(XmlTypeConverter<T> converter) =>
       _typeConverters[T] = converter;
 
   @override
   FutureOr<Request> convertRequest(Request request) {
     final converter = _typeConverters[request.body.runtimeType];
-    if (converter != null) {
+    if (converter is XmlTypeConverter) {
       return _xmlConverter.convertRequest(
         request.copyWith(
           body: converter.toXml(request.body),
@@ -58,8 +59,8 @@ class XmlTypedConverter extends Converter {
   FutureOr<Response<BodyType>> convertResponse<BodyType, InnerType>(
     Response response,
   ) async {
-    final converter = _typeConverters[BodyType] as TypeConverter<BodyType>?;
-    if (converter != null) {
+    final converter = _typeConverters[BodyType] as XmlTypeConverter<BodyType>?;
+    if (converter is XmlTypeConverter<BodyType>) {
       final xmlResponse = await _xmlConverter
           .convertResponse<XmlDocument, XmlDocument>(response);
       if (xmlResponse.body == null) {

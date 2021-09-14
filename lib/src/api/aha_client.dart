@@ -1,10 +1,11 @@
 import 'package:aha_client/src/api/login/login_manager.dart';
 import 'package:chopper/chopper.dart';
+import 'package:http/http.dart';
 
-import 'aha_service.dart';
+import 'aha/aha_service.dart';
 import 'login/login_service.dart';
 import 'login/models/session_info.dart';
-import 'xml_typed_converter.dart';
+import 'util/xml_typed_converter.dart';
 
 class AhaClient {
   static const defaultHostName = 'fritz.box';
@@ -17,7 +18,9 @@ class AhaClient {
     String hostName = defaultHostName,
     int? port,
     required this.loginManager,
+    Client? httpClient,
   }) : client = ChopperClient(
+          client: httpClient,
           baseUrl: Uri(
             scheme: 'https',
             host: hostName,
@@ -45,5 +48,5 @@ class AhaClient {
     client.dispose();
   }
 
-  AhaService get aha => client.getService();
+  late final AhaService aha = client.getService();
 }

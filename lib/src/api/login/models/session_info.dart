@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 
-import '../../xml_typed_converter.dart';
+import '../../util/xml_typed_converter.dart';
 import 'right.dart';
 import 'user.dart';
 
@@ -11,7 +11,8 @@ part 'session_info.freezed.dart';
 class SessionInfo with _$SessionInfo {
   static const invalidSid = '0000000000000000';
 
-  static const converter = _SessionInfoTypeConverter();
+  static const XmlTypeConverter<SessionInfo> converter =
+      _SessionInfoTypeConverter();
 
   const SessionInfo._();
 
@@ -81,7 +82,7 @@ class SessionInfo with _$SessionInfo {
   }
 }
 
-class _SessionInfoTypeConverter extends SimpleTypeConverter<SessionInfo> {
+class _SessionInfoTypeConverter extends SimpleXmlTypeConverter<SessionInfo> {
   const _SessionInfoTypeConverter();
 
   @override

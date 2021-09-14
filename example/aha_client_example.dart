@@ -35,9 +35,16 @@ class ExampleLoginManager extends LoginManager {
     final username = stdin.readLineSync();
     stdout.write('Password: ');
     await stdout.flush();
-    stdin.echoMode = false;
-    final password = stdin.readLineSync();
-    stdin.echoMode = true;
+
+    final echoMode = stdin.echoMode;
+    String? password;
+    try {
+      stdin.echoMode = false;
+      password = stdin.readLineSync();
+      stdout.writeln();
+    } finally {
+      stdin.echoMode = echoMode;
+    }
 
     if (username == null || password == null) {
       return null;
@@ -55,8 +62,8 @@ Future<void> main() async {
 
   final response = await client.aha.getDeviceListInfos();
   print(response.statusCode);
-  print(response.headers);
-  print(response.bodyString);
+  print('');
+  print(response.body);
 
   await client.dispose();
 }
