@@ -15,4 +15,8 @@ class AuthenticationException
       _InvalidChallangeFormat;
 
   factory AuthenticationException.invalidCredentials() = _InvalidCredentials;
+
+  factory AuthenticationException.loginCanceled() = _LoginCanceled;
+
+  factory AuthenticationException.logoutFailed() = _LogoutFailed;
 }

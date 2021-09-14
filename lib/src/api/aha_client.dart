@@ -9,7 +9,7 @@ import 'xml_typed_converter.dart';
 class AhaClient {
   static const defaultHostName = 'fritz.box';
 
-  final ChopperClient _client;
+  final ChopperClient client;
 
   final LoginManager loginManager;
 
@@ -17,7 +17,7 @@ class AhaClient {
     String hostName = defaultHostName,
     int? port,
     required this.loginManager,
-  }) : _client = ChopperClient(
+  }) : client = ChopperClient(
           baseUrl: Uri(
             scheme: 'https',
             host: hostName,
@@ -34,12 +34,16 @@ class AhaClient {
             AhaService.create(),
           ],
         ) {
-    loginManager.linkToClient(_client);
+    loginManager.setup(client.getService());
   }
 
-  void dispose() => _client.dispose();
+  Future<void> dispose({bool withLogout = true}) async {
+    if (withLogout) {
+      await loginManager.logout();
+    }
 
-  LoginService get login => _client.getService();
+    client.dispose();
+  }
 
-  AhaService get aha => _client.getService();
+  AhaService get aha => client.getService();
 }

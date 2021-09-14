@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:aha_client/src/api/login/login_info.dart';
 import 'package:chopper/chopper.dart';
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
@@ -10,7 +11,6 @@ import 'authentication_exception.dart';
 import 'login_service.dart';
 import 'models/right.dart';
 import 'models/session_info.dart';
-import 'models/user.dart';
 import 'user_credentials.dart';
 
 // ignore: must_be_immutable
@@ -24,7 +24,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
   var _sid = SessionInfo.invalidSid;
   var _rights = const <Right>[];
 
-  late final ChopperClient _client;
+  late final LoginService _loginService;
 
   List<Right> get rights => _rights;
 
@@ -42,10 +42,33 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     _sid = sid;
   }
 
-  Future<void> login() => _performLogin();
+  Future<void> login() async {
+    final sessionInfo = await _getLoginStatus();
+    if (sessionInfo.sid == SessionInfo.invalidSid) {
+      final loginInfo = await _performLogin(sessionInfo, LoginReason.manual);
+
+      if (loginInfo.sid == SessionInfo.invalidSid) {
+        throw AuthenticationException.invalidCredentials();
+      }
+    }
+  }
+
+  Future<void> logout() async {
+    if (_sid == SessionInfo.invalidSid) {
+      return;
+    }
+
+    final sessionInfo = _extractSessionInfo(
+      await _loginService.logout(sid: _sid),
+    );
+
+    if (sessionInfo.sid != SessionInfo.invalidSid) {
+      throw AuthenticationException.logoutFailed();
+    }
+  }
 
   @protected
-  FutureOr<UserCredentials> obtainCredentials(List<User> knownUsers);
+  FutureOr<UserCredentials?> obtainCredentials(LoginInfo loginInfo);
 
   @override
   @internal
@@ -55,7 +78,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     }
 
     if (_sid == SessionInfo.invalidSid) {
-      await _performLogin();
+      await _autoLogin(false);
     }
 
     return _copyRequestWithSid(request);
@@ -68,52 +91,75 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
       return null;
     }
 
-    await _performLogin();
+    await _autoLogin(true);
     return _copyRequestWithSid(request);
   }
 
   @internal
   // ignore: use_setters_to_change_properties
-  void linkToClient(ChopperClient client) {
-    _client = client;
+  void setup(LoginService loginService) {
+    _loginService = loginService;
   }
 
-  Request _copyRequestWithSid(Request request) => request.copyWith(parameters: {
-        ...request.parameters,
-        'sid': _sid,
-      });
+  Request _copyRequestWithSid(Request request) => request.copyWith(
+        parameters: {
+          ...request.parameters,
+          'sid': _sid,
+        },
+      );
 
-  Future<void> _performLogin() async {
-    final loginService = _client.getService<LoginService>();
+  Future<void> _autoLogin(bool isRefresh) async {
+    var sessionInfo = await _getLoginStatus();
+    while (sessionInfo.sid == SessionInfo.invalidSid) {
+      sessionInfo = await _performLogin(
+        sessionInfo,
+        isRefresh ? LoginReason.refresh : LoginReason.auto,
+      );
+    }
+  }
 
-    final sessionInfo = _extractSessionInfo(
+  Future<SessionInfo> _getLoginStatus() async {
+    return _extractSessionInfo(
       _sid == SessionInfo.invalidSid
-          ? await loginService.getLoginStatus()
-          : await loginService.checkSessionValid(sid: _sid),
+          ? await _loginService.getLoginStatus()
+          : await _loginService.checkSessionValid(sid: _sid),
     );
+  }
 
-    final blockTimeout = Future.delayed(
-      Duration(seconds: sessionInfo.blockTime),
+  Future<SessionInfo> _performLogin(
+    SessionInfo sessionInfo,
+    LoginReason reason,
+  ) async {
+    final blockDelay = sessionInfo.blockTime > 0
+        ? Duration(seconds: sessionInfo.blockTime)
+        : null;
+    final blockTimeout = blockDelay != null ? Future.delayed(blockDelay) : null;
+
+    final credentials = await obtainCredentials(
+      LoginInfo(
+        knownUsers: sessionInfo.users,
+        blockTime: blockDelay,
+        reason: reason,
+      ),
     );
-
-    final credentials = await obtainCredentials(sessionInfo.users);
+    if (credentials == null) {
+      throw AuthenticationException.loginCanceled();
+    }
 
     final response = await _solveVersion2Challange(sessionInfo, credentials);
 
-    await blockTimeout;
+    if (blockTimeout != null) {
+      await blockTimeout;
+    }
+
     final loginResult = _extractSessionInfo(
-      await loginService.login(
+      await _loginService.login(
         username: credentials.username,
         response: response,
       ),
     );
 
-    if (loginResult.sid == SessionInfo.invalidSid) {
-      throw AuthenticationException.invalidCredentials();
-    }
-
-    _sid = loginResult.sid;
-    _rights = loginResult.rights;
+    return loginResult;
   }
 
   Future<String> _solveVersion2Challange(
@@ -161,7 +207,11 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
       );
     }
 
-    return response.body!;
+    final sessionInfo = response.body!;
+    _sid = sessionInfo.sid;
+    _rights = sessionInfo.rights;
+
+    return sessionInfo;
   }
 }
 

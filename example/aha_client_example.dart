@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:aha_client/src/api/aha_client.dart';
+import 'package:aha_client/src/api/login/login_info.dart';
 import 'package:aha_client/src/api/login/login_manager.dart';
-import 'package:aha_client/src/api/login/models/user.dart';
 import 'package:aha_client/src/api/login/user_credentials.dart';
 
 class _AhaClientHttpOverrides extends HttpOverrides {
@@ -23,16 +23,26 @@ class _AhaClientHttpOverrides extends HttpOverrides {
 
 class ExampleLoginManager extends LoginManager {
   @override
-  FutureOr<UserCredentials> obtainCredentials(List<User> knownUsers) async {
-    stdout.writeln('Known usernames: $knownUsers');
+  FutureOr<UserCredentials?> obtainCredentials(LoginInfo loginInfo) async {
+    if (loginInfo.blockTime != null) {
+      stdout.writeln(
+        'Login blocked until: ${DateTime.now().add(loginInfo.blockTime!)}',
+      );
+    }
+    stdout.writeln('Known usernames: ${loginInfo.knownUsers}');
     stdout.write('Username: ');
     await stdout.flush();
-    final username = stdin.readLineSync()!;
+    final username = stdin.readLineSync();
     stdout.write('Password: ');
     await stdout.flush();
     stdin.echoMode = false;
-    final password = stdin.readLineSync()!;
+    final password = stdin.readLineSync();
     stdin.echoMode = true;
+
+    if (username == null || password == null) {
+      return null;
+    }
+
     return UserCredentials(username: username, password: password);
   }
 }
@@ -48,5 +58,5 @@ Future<void> main() async {
   print(response.headers);
   print(response.bodyString);
 
-  client.dispose();
+  await client.dispose();
 }
