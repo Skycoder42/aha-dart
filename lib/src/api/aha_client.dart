@@ -1,11 +1,14 @@
-import 'package:aha_client/src/api/login/login_manager.dart';
 import 'package:chopper/chopper.dart';
 import 'package:http/http.dart';
 
 import 'aha/aha_service.dart';
+import 'aha/models/switch_status.dart';
+import 'login/login_manager.dart';
 import 'login/login_service.dart';
 import 'login/models/session_info.dart';
-import 'util/xml_typed_converter.dart';
+import 'util/combined_converter.dart';
+import 'util/text_converter.dart';
+import 'util/xml_converter.dart';
 
 class AhaClient {
   static const defaultHostName = 'fritz.box';
@@ -26,8 +29,10 @@ class AhaClient {
             host: hostName,
             port: port,
           ).toString(),
-          converter: XmlTypedConverter()
-            ..registerConverter<SessionInfo>(SessionInfo.converter),
+          converter: CombinedConverter([
+            XmlConverter()..registerConverter(SessionInfo.converter),
+            TextConverter()..registerConverter(SwitchStatus.converter),
+          ]),
           interceptors: [
             loginManager,
           ],

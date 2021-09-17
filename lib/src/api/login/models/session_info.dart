@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 
-import '../../util/xml_typed_converter.dart';
+import '../../util/xml_converter.dart';
 import 'right.dart';
 import 'user.dart';
 
