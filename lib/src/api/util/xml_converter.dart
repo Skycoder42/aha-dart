@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:aha_client/src/api/util/content_type_extractor.dart';
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
 import 'combined_converter.dart';
+import 'content_type_extractor.dart';
 
 abstract class XmlTypeConverter<T> {
   const XmlTypeConverter._();
@@ -47,7 +47,8 @@ class XmlConverter with ContentTypeExtractor implements Converter {
 
   @override
   FutureOr<Request> convertRequest(Request request) {
-    final converter = _findConverter(request.body.runtimeType);
+    // ignore: avoid_dynamic_calls
+    final converter = _findConverter<dynamic>(request.body.runtimeType);
     return request.copyWith(
       body: converter.toXml(request.body).toXmlString(),
       headers: {

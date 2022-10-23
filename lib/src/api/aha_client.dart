@@ -33,7 +33,7 @@ class AhaClient {
             XmlConverter()..registerConverter(SessionInfo.converter),
             TextConverter()..registerConverter(SwitchStatus.converter),
           ]),
-          interceptors: [
+          interceptors: <dynamic>[
             loginManager,
           ],
           authenticator: loginManager,

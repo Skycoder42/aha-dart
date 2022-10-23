@@ -13,14 +13,13 @@ class _AhaClientHttpOverrides extends HttpOverrides {
   _AhaClientHttpOverrides(this._host, this._port);
 
   @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) =>
-              host == _host && port == _port;
-  }
+  HttpClient createHttpClient(SecurityContext? context) =>
+      super.createHttpClient(context)
+        ..badCertificateCallback =
+            (cert, host, port) => host == _host && port == _port;
 }
 
+// ignore: must_be_immutable
 class ExampleLoginManager extends LoginManager {
   @override
   FutureOr<UserCredentials?> obtainCredentials(LoginInfo loginInfo) async {
@@ -29,8 +28,9 @@ class ExampleLoginManager extends LoginManager {
         'Login blocked until: ${DateTime.now().add(loginInfo.blockTime!)}',
       );
     }
-    stdout.writeln('Known usernames: ${loginInfo.knownUsers}');
-    stdout.write('Username: ');
+    stdout
+      ..writeln('Known usernames: ${loginInfo.knownUsers}')
+      ..write('Username: ');
     await stdout.flush();
     final username = stdin.readLineSync();
     stdout.write('Password: ');
@@ -61,8 +61,11 @@ Future<void> main() async {
   final client = AhaClient(loginManager: ExampleLoginManager());
 
   final response = await client.aha.getDeviceListInfos();
+  // ignore: avoid_print
   print(response.statusCode);
+  // ignore: avoid_print
   print('');
+  // ignore: avoid_print
   print(response.body);
 
   await client.dispose();

@@ -1,13 +1,10 @@
-include: package:lint/analysis_options_package.yaml
-
-# For lint rules and documentation, see http://dart-lang.github.io/linter/lints.
-
-# Uncomment to specify additional rules.
-# linter:
-#   rules:
-#     - camel_case_types
+include: package:dart_test_tools/analysis_options_package.yaml
 
 analyzer:
   exclude:
-    - '**/*.chopper.dart'
-    - '**/*.freezed.dart'
+    - "**/*.chopper.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    public_member_api_docs: false

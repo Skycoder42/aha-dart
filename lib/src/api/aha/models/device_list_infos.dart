@@ -1,6 +1,7 @@
-import 'package:aha_client/src/api/util/xml_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
+
+import '../../util/xml_converter.dart';
 
 part 'device_list_infos.freezed.dart';
 
@@ -16,14 +17,15 @@ class DeviceList with _$DeviceList {
   }) = _DeviceList;
 
   factory DeviceList.fromXml(XmlElement element) {
-    assert(element.name.toString() == 'devicelist');
+    assert(
+      element.name.toString() == 'devicelist',
+      'element must be a <devicelist> element.',
+    );
 
     return DeviceList(
       version: element.getAttribute('version') ?? '',
       fwversion: element.getAttribute('fwversion') ?? '',
-      devices: List.unmodifiable(
-        element.childElements.map((element) => Device.fromXml(element)),
-      ),
+      devices: element.childElements.map<Device>(Device.fromXml).toList(),
     );
   }
 
@@ -62,7 +64,10 @@ class Device with _$Device {
   }) = _Device;
 
   factory Device.fromXml(XmlElement element) {
-    assert(element.name.toString() == 'device');
+    assert(
+      element.name.toString() == 'device',
+      'element must be a <device> element.',
+    );
 
     return Device(
       identifier: element.getAttribute('identifier') ?? '',

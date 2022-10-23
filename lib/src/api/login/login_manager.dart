@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:aha_client/src/api/login/login_info.dart';
 import 'package:chopper/chopper.dart';
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:meta/meta.dart';
 
 import 'authentication_exception.dart';
+import 'login_info.dart';
 import 'login_service.dart';
 import 'models/right.dart';
 import 'models/session_info.dart';
@@ -86,7 +86,11 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
   @override
   @internal
-  FutureOr<Request?> authenticate(Request request, Response response) async {
+  FutureOr<Request?> authenticate(
+    Request request,
+    Response response, [
+    Request? originalRequest,
+  ]) async {
     if (response.statusCode != 403 || request.isLogin) {
       return null;
     }
@@ -102,7 +106,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
   }
 
   Request _copyRequestWithSid(Request request) => request.copyWith(
-        parameters: {
+        parameters: <String, dynamic>{
           ...request.parameters,
           'sid': _sid,
         },
@@ -118,13 +122,11 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     }
   }
 
-  Future<SessionInfo> _getLoginStatus() async {
-    return _extractSessionInfo(
-      _sid == SessionInfo.invalidSid
-          ? await _loginService.getLoginStatus()
-          : await _loginService.checkSessionValid(sid: _sid),
-    );
-  }
+  Future<SessionInfo> _getLoginStatus() async => _extractSessionInfo(
+        _sid == SessionInfo.invalidSid
+            ? await _loginService.getLoginStatus()
+            : await _loginService.checkSessionValid(sid: _sid),
+      );
 
   Future<SessionInfo> _performLogin(
     SessionInfo sessionInfo,
@@ -133,7 +135,8 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     final blockDelay = sessionInfo.blockTime > 0
         ? Duration(seconds: sessionInfo.blockTime)
         : null;
-    final blockTimeout = blockDelay != null ? Future.delayed(blockDelay) : null;
+    final blockTimeout =
+        blockDelay != null ? Future<void>.delayed(blockDelay) : null;
 
     final credentials = await obtainCredentials(
       LoginInfo(
@@ -216,5 +219,5 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 }
 
 extension _RequestX on Request {
-  bool get isLogin => url.contains('/login_sid.lua');
+  bool get isLogin => url.path.endsWith('/login_sid.lua');
 }

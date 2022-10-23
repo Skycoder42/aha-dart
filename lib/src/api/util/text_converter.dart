@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:aha_client/src/api/util/content_type_extractor.dart';
 import 'package:chopper/chopper.dart';
 
 import '../aha/models/optional.dart';
 import 'combined_converter.dart';
+import 'content_type_extractor.dart';
 
 abstract class TextTypeConverter<T> {
   String encode(T data);
@@ -20,11 +20,9 @@ class TextConverter with ContentTypeExtractor implements Converter {
       _typeConverters[T] = converter;
 
   @override
-  FutureOr<Request> convertRequest(Request request) {
-    return request.copyWith(
-      body: _encode(request.body),
-    );
-  }
+  FutureOr<Request> convertRequest(Request request) => request.copyWith(
+        body: _encode(request.body),
+      );
 
   @override
   FutureOr<Response<BodyType>> convertResponse<BodyType, InnerType>(
@@ -45,13 +43,13 @@ class TextConverter with ContentTypeExtractor implements Converter {
       }
     }
 
-    return _findConverter(data.runtimeType).encode(data);
+    return _findConverter<dynamic>(data.runtimeType).encode(data);
   }
 
   TBody _decode<TBody, TInner>(String data) {
     if (TBody is Optional) {
       if (data == Optional.invalidStringValue) {
-        return const Optional.invalid() as TBody;
+        return const Optional<Never>.invalid() as TBody;
       } else {
         return Optional(_decode<TInner, TInner>(data)) as TBody;
       }
@@ -71,6 +69,8 @@ class TextConverter with ContentTypeExtractor implements Converter {
   }
 
   TextTypeConverter<T> _findConverter<T>([Type? t]) {
+    assert(T != dynamic || t != null, 'Either T or t must be given');
+
     final converter = _typeConverters[t ?? T] as TextTypeConverter<T>?;
     if (converter == null) {
       throw ConversionNotSupportedException(

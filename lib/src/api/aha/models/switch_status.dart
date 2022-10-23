@@ -1,5 +1,6 @@
-import 'package:aha_client/src/api/util/text_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../util/text_converter.dart';
 
 part 'switch_status.freezed.dart';
 

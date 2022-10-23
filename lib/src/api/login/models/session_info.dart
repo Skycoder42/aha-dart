@@ -26,11 +26,14 @@ class SessionInfo with _$SessionInfo {
   }) = _SessionInfo;
 
   factory SessionInfo.fromXml(XmlElement element) {
-    assert(element.name.toString() == 'SessionInfo');
+    assert(
+      element.name.toString() == 'SessionInfo',
+      'element must be a <SessionInfo> element',
+    );
 
     final rights =
         element.getElement('Rights')?.childElements.toList() ?? const [];
-    assert(rights.length % 2 == 0, 'Rights must contain pairs of elements');
+    assert(rights.length.isEven, 'Rights must contain pairs of elements');
 
     final parsedRights = <Right>[];
     for (var i = 0; i < rights.length; i += 2) {
@@ -43,14 +46,13 @@ class SessionInfo with _$SessionInfo {
       sid: element.getElement('SID')!.text,
       challange: element.getElement('Challenge')!.text,
       blockTime: int.parse(element.getElement('BlockTime')!.text),
-      users: List.unmodifiable(
-        element
-                .getElement('Users')
-                ?.childElements
-                .map((e) => User.fromXml(e)) ??
-            const [],
-      ),
-      rights: List.unmodifiable(parsedRights),
+      users: element
+              .getElement('Users')
+              ?.childElements
+              .map(User.fromXml)
+              .toList() ??
+          const [],
+      rights: parsedRights,
     );
   }
 

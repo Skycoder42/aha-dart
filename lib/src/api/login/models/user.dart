@@ -14,7 +14,10 @@ class User with _$User {
   }) = _User;
 
   factory User.fromXml(XmlElement element) {
-    assert(element.name.toString() == 'User');
+    assert(
+      element.name.toString() == 'User',
+      'element must be a <User> element.',
+    );
     return User(
       element.text,
       last: element.getAttribute('last') == '1',

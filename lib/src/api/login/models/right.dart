@@ -25,8 +25,14 @@ class Right with _$Right {
   }) = _Right;
 
   factory Right.fromXml(XmlElement nameElement, XmlElement accessElement) {
-    assert(nameElement.name.toString() == 'Name');
-    assert(accessElement.name.toString() == 'Access');
+    assert(
+      nameElement.name.toString() == 'Name',
+      'nameElement must be a <Name> element',
+    );
+    assert(
+      accessElement.name.toString() == 'Access',
+      'accessElement must be an <Access> element.',
+    );
 
     final access = AccessLevel.values[int.parse(accessElement.text)];
 

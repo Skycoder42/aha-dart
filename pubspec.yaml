@@ -4,21 +4,27 @@ version: 1.0.0
 homepage: https://github.com/Skycoder42/aha-dart
 
 environment:
-  sdk: '>=2.14.0 <3.0.0'
+  sdk: ">=2.18.2 <3.0.0"
 
 dependencies:
-  chopper: ^4.0.1
-  convert: ^3.0.1
-  cryptography: ^2.0.2
-  freezed_annotation: ^0.15.0
-  http: ^0.13.4
-  meta: ^1.7.0
-  xml: ^5.2.0
+  chopper: ^5.1.0
+  convert: ^3.1.1
+  cryptography: ^2.0.5
+  freezed_annotation: ^2.2.0
+  http: ^0.13.5
+  meta: ^1.8.0
+  xml: ^6.1.0
 
 dev_dependencies:
-  build_runner: ^2.1.4
-  chopper_generator: ^4.0.2
-  freezed: ^0.15.0+1
-  lint: ^1.7.2
-  test: ^1.19.2
+  build_runner: ^2.3.2
+  chopper_generator: ^5.1.0+1
+  dart_pre_commit: ^4.0.0
+  dart_test_tools: ^4.5.3+1
+  freezed: ^2.2.0
+  test: ^1.21.6
 
+dart_pre_commit:
+  lib-exports: false
+  pull-up-dependencies:
+    allowed:
+      - xml # flutter

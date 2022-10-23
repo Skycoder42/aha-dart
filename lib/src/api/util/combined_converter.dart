@@ -77,7 +77,8 @@ extension _ErrorInfoListX on Iterable<_ErrorInfo> {
   UnsupportedDataException toRequestException(Request request) =>
       UnsupportedDataException._(
         'Failed to convert request to '
-        '${buildUri(request.baseUrl, request.url, request.parameters)}',
+        '$request', // TODO formatting of request
+        // ignore: avoid_dynamic_calls
         request.body.runtimeType,
         _asMap(),
       );
