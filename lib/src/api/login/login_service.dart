@@ -24,16 +24,14 @@ abstract class LoginService extends ChopperService {
   @FactoryConverter(
     request: FormUrlEncodedConverter.requestFactory,
   )
-  Future<Response<SessionInfo>> checkSessionValid({
-    @Field() required String sid,
-  });
+  Future<Response<SessionInfo>> checkSessionValid(@Field() String sid);
 
   @Post()
   @FactoryConverter(
     request: FormUrlEncodedConverter.requestFactory,
   )
-  Future<Response<SessionInfo>> logout({
-    @Field() required String sid,
+  Future<Response<SessionInfo>> logout(
+    @Field() String sid, {
     @Field() bool logout = true,
   });
 }

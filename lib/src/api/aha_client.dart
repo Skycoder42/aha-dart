@@ -2,6 +2,7 @@ import 'package:chopper/chopper.dart';
 import 'package:http/http.dart';
 
 import 'aha/aha_service.dart';
+import 'aha/models/device_list.dart';
 import 'aha/models/switch_status.dart';
 import 'login/login_manager.dart';
 import 'login/login_service.dart';
@@ -30,7 +31,15 @@ class AhaClient {
             port: port,
           ).toString(),
           converter: CombinedConverter([
-            XmlConverter()..registerConverter(SessionInfo.converter),
+            XmlConverter()
+              ..registerConverter(
+                sessionInfoElementName,
+                SessionInfo.fromXmlElement,
+              )
+              ..registerConverter(
+                deviceListElementName,
+                DeviceList.fromXmlElement,
+              ),
             TextConverter()..registerConverter(SwitchStatus.converter),
           ]),
           interceptors: <dynamic>[
@@ -42,7 +51,7 @@ class AhaClient {
             AhaService.create(),
           ],
         ) {
-    loginManager.setup(client.getService());
+    loginManager.setup(client.getService<LoginService>());
   }
 
   Future<void> dispose({bool withLogout = true}) async {

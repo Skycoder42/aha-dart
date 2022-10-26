@@ -1,95 +1,56 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
+import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_converter.dart';
+import '../../util/xml_convertible.dart';
 import 'right.dart';
+import 'sid.dart';
 import 'user.dart';
 
-part 'session_info.freezed.dart';
+part 'session_info.g.dart';
 
-@freezed
-class SessionInfo with _$SessionInfo {
-  static const invalidSid = '0000000000000000';
+const sessionInfoElementName = 'SessionInfo';
 
-  static const XmlTypeConverter<SessionInfo> converter =
-      _SessionInfoTypeConverter();
+@xml.XmlSerializable(createMixin: true)
+@xml.XmlRootElement(name: sessionInfoElementName)
+@immutable
+class SessionInfo extends XmlConvertible<SessionInfo>
+    with _$SessionInfoXmlSerializableMixin, _SessionInfoEquality {
+  @xml.XmlElement(name: 'SID')
+  final Sid sid;
 
-  const SessionInfo._();
+  @xml.XmlElement(name: 'Challenge')
+  final String challenge;
 
-  // ignore: sort_unnamed_constructors_first
-  const factory SessionInfo({
-    required String sid,
-    required String challange,
-    required int blockTime,
-    required List<User> users,
-    required List<Right> rights,
-  }) = _SessionInfo;
+  @xml.XmlElement(name: 'BlockTime')
+  final int blockTime;
 
-  factory SessionInfo.fromXml(XmlElement element) {
-    assert(
-      element.name.toString() == 'SessionInfo',
-      'element must be a <SessionInfo> element',
-    );
+  @xml.XmlElement(name: 'Users')
+  final Users users;
 
-    final rights =
-        element.getElement('Rights')?.childElements.toList() ?? const [];
-    assert(rights.length.isEven, 'Rights must contain pairs of elements');
+  @xml.XmlElement(name: 'Rights')
+  final AccessRights accessRights;
 
-    final parsedRights = <Right>[];
-    for (var i = 0; i < rights.length; i += 2) {
-      final nameElement = rights[i];
-      final accessElement = rights[i + 1];
-      parsedRights.add(Right.fromXml(nameElement, accessElement));
-    }
+  const SessionInfo({
+    required this.sid,
+    required this.challenge,
+    required this.blockTime,
+    required this.users,
+    required this.accessRights,
+  });
 
-    return SessionInfo(
-      sid: element.getElement('SID')!.text,
-      challange: element.getElement('Challenge')!.text,
-      blockTime: int.parse(element.getElement('BlockTime')!.text),
-      users: element
-              .getElement('Users')
-              ?.childElements
-              .map(User.fromXml)
-              .toList() ??
-          const [],
-      rights: parsedRights,
-    );
-  }
-
-  void toXml(XmlBuilder builder) {
-    builder.element(
-      'SessionInfo',
-      nest: () => builder
-        ..element('SID', nest: sid)
-        ..element('Challange', nest: challange)
-        ..element('BlockTime', nest: blockTime)
-        ..element('Rights')
-        ..element(
-          'Users',
-          nest: () {
-            for (final user in users) {
-              user.toXml(builder);
-            }
-          },
-        )
-        ..element(
-          'Rights',
-          nest: () {
-            for (final right in rights) {
-              right.toXml(builder);
-            }
-          },
-        ),
-    );
-  }
+  factory SessionInfo.fromXmlElement(XmlElement element) =>
+      _$SessionInfoFromXmlElement(element);
 }
 
-class _SessionInfoTypeConverter extends SimpleXmlTypeConverter<SessionInfo> {
-  const _SessionInfoTypeConverter();
-
+mixin _SessionInfoEquality on XmlConvertible<SessionInfo> {
   @override
-  void buildXml(SessionInfo data, XmlBuilder builder) => data.toXml(builder);
-
-  @override
-  SessionInfo parseXml(XmlElement element) => SessionInfo.fromXml(element);
+  @visibleForOverriding
+  List<Object?> get props => [
+        self.sid,
+        self.challenge,
+        self.blockTime,
+        self.users,
+        self.accessRights,
+      ];
 }

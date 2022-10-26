@@ -1,0 +1,83 @@
+{
+	// Place your aha-dart workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Create XML serializable with root element": {
+		"scope": "dart",
+		"prefix": [
+			"xml-root",
+			"xml-serializable-root"
+		],
+		"body": [
+			"import 'package:meta/meta.dart';",
+			"import 'package:xml/xml.dart';",
+			"import 'package:xml_annotation/xml_annotation.dart' as xml;",
+			"",
+			"part '$TM_FILENAME_BASE.g.dart';",
+			"",
+			"const ${1/(.)(.*)/${1:/downcase}$2/}ElementName = '$2';",
+			"",
+			"@xml.XmlSerializable(createMixin: true)",
+			"@xml.XmlRootElement(name: ${1/(.)(.*)/${1:/downcase}$2/}ElementName)",
+			"@immutable",
+			"class ${1/(.)(.*)/${1:/upcase}$2/} extends XmlConvertible<${1/(.)(.*)/${1:/upcase}$2/}>",
+			"    with _$${1/(.)(.*)/${1:/upcase}$2/}XmlSerializableMixin, _${1/(.)(.*)/${1:/upcase}$2/}Equality {",
+			"",
+			"const ${1/(.)(.*)/${1:/upcase}$2/}();",
+			"",
+			"factory ${1/(.)(.*)/${1:/upcase}$2/}.fromXmlElement(XmlElement element) =>",
+			"    _$${1/(.)(.*)/${1:/upcase}$2/}FromXmlElement(element);",
+			"}",
+			"",
+			"mixin _${1/(.)(.*)/${1:/upcase}$2/}Equality on XmlConvertible$0<${1/(.)(.*)/${1:/upcase}$2/}> {",
+			"  @override",
+			"  List<Object?> get props => [];",
+			"}"
+		],
+		"description": "Creates a XML serializable and convertible class",
+	},
+	"Create XML serializable": {
+		"scope": "dart",
+		"prefix": [
+			"xml",
+			"xml-serializable"
+		],
+		"body": [
+			"import 'package:meta/meta.dart';",
+			"import 'package:xml/xml.dart';",
+			"import 'package:xml_annotation/xml_annotation.dart' as xml;",
+			"",
+			"part '$TM_FILENAME_BASE.g.dart';",
+			"",
+			"@xml.XmlSerializable(createMixin: true)",
+			"@immutable",
+			"class ${1/(.)(.*)/${1:/upcase}$2/} extends XmlEquatable<${1/(.)(.*)/${1:/upcase}$2/}>",
+			"    with _$${1/(.)(.*)/${1:/upcase}$2/}XmlSerializableMixin, _${1/(.)(.*)/${1:/upcase}$2/}Equality {",
+			"",
+			"const ${1/(.)(.*)/${1:/upcase}$2/}();",
+			"",
+			"factory ${1/(.)(.*)/${1:/upcase}$2/}.fromXmlElement(XmlElement element) =>",
+			"    _$${1/(.)(.*)/${1:/upcase}$2/}FromXmlElement(element);",
+			"}",
+			"",
+			"mixin _${1/(.)(.*)/${1:/upcase}$2/}Equality on XmlEquatable$0<${1/(.)(.*)/${1:/upcase}$2/}> {",
+			"  @override",
+			"  List<Object?> get props => [];",
+			"}"
+		],
+		"description": "Creates a XML serializable and equatable class",
+	}
+}

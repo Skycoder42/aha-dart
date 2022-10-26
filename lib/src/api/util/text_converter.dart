@@ -51,7 +51,7 @@ class TextConverter with ContentTypeExtractor implements Converter {
       if (data == Optional.invalidStringValue) {
         return const Optional<Never>.invalid() as TBody;
       } else {
-        return Optional(_decode<TInner, TInner>(data)) as TBody;
+        return Optional.fromValue(_decode<TInner, TInner>(data)) as TBody;
       }
     }
 

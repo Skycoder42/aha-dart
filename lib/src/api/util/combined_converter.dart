@@ -64,6 +64,9 @@ class ConversionNotSupportedException implements Exception {
   final String reason;
 
   ConversionNotSupportedException(this.converterType, this.reason);
+
+  @override
+  String toString() => '$converterType: $reason';
 }
 
 class _ErrorInfo {

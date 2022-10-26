@@ -65,8 +65,13 @@ Future<void> main() async {
   print(response.statusCode);
   // ignore: avoid_print
   print('');
-  // ignore: avoid_print
-  print(response.body);
+  if (response.isSuccessful) {
+    // ignore: avoid_print
+    print(response.body);
+  } else {
+    // ignore: avoid_print
+    print(response.error);
+  }
 
   await client.dispose();
 }

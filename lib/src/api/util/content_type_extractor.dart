@@ -1,6 +1,8 @@
-mixin ContentTypeExtractor {
-  static const contentTypeHeader = 'Content-Type';
+import 'package:chopper/chopper.dart';
+import 'package:meta/meta.dart';
 
+mixin ContentTypeExtractor {
+  @protected
   String? getContentType(Map<String, String> headers) =>
-      headers[contentTypeHeader.toLowerCase()]?.split(';').first;
+      headers[contentTypeKey]?.split(';').first;
 }

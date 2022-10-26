@@ -1,70 +1,72 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
+import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-part 'right.freezed.dart';
+import '../../util/xml_convertible.dart';
 
+part 'right.g.dart';
+
+@xml.XmlEnum()
+enum AccessName {
+  @xml.XmlValue('NAS')
+  nas,
+  @xml.XmlValue('App')
+  app,
+  @xml.XmlValue('HomeAuto')
+  homeAuto,
+  @xml.XmlValue('BoxAdmin')
+  boxAdmin,
+  @xml.XmlValue('Phone')
+  phone;
+}
+
+@xml.XmlEnum()
 enum AccessLevel {
+  @xml.XmlValue('0')
   none,
+  @xml.XmlValue('1')
   read,
+  @xml.XmlValue('2')
   write,
 }
 
-@freezed
-class Right with _$Right {
-  const Right._();
+@xml.XmlSerializable(createMixin: true)
+@immutable
+class AccessRights extends XmlEquatable<AccessRights>
+    with _$AccessRightsXmlSerializableMixin, _AccessRightsEquality {
+  @xml.XmlElement(name: 'Name')
+  final List<AccessName>? names;
 
-  const factory Right.nas(AccessLevel access) = _Nas;
-  const factory Right.app(AccessLevel access) = _App;
-  const factory Right.homeAuto(AccessLevel access) = _HomeAuto;
-  const factory Right.boxAdmin(AccessLevel access) = _BoxAdmin;
-  const factory Right.phone(AccessLevel access) = _Phone;
+  @xml.XmlElement(name: 'Access')
+  final List<AccessLevel>? accesses;
 
-  const factory Right.unknown({
-    required String name,
-    required AccessLevel access,
-  }) = _Right;
-
-  factory Right.fromXml(XmlElement nameElement, XmlElement accessElement) {
-    assert(
-      nameElement.name.toString() == 'Name',
-      'nameElement must be a <Name> element',
-    );
-    assert(
-      accessElement.name.toString() == 'Access',
-      'accessElement must be an <Access> element.',
-    );
-
-    final access = AccessLevel.values[int.parse(accessElement.text)];
-
-    switch (nameElement.text) {
-      case 'NAS':
-        return Right.nas(access);
-      case 'App':
-        return Right.app(access);
-      case 'HomeAuto':
-        return Right.homeAuto(access);
-      case 'BoxAdmin':
-        return Right.boxAdmin(access);
-      case 'Phone':
-        return Right.phone(access);
-      default:
-        return Right.unknown(
-          name: nameElement.text,
-          access: access,
+  const AccessRights({
+    required this.names,
+    required this.accesses,
+  }) : assert(
+          names?.length == accesses?.length,
+          'names and accesses must have equal lengths',
         );
+
+  const AccessRights.empty()
+      : names = null,
+        accesses = null;
+
+  factory AccessRights.fromXmlElement(XmlElement element) =>
+      _$AccessRightsFromXmlElement(element);
+
+  AccessLevel getAccessLevelFor(AccessName accessName) {
+    final nameIndex = names?.indexOf(accessName) ?? -1;
+    if (nameIndex < 0) {
+      return AccessLevel.none;
+    } else {
+      return accesses?[nameIndex] ?? AccessLevel.none;
     }
   }
+}
 
-  String get name => when(
-        nas: (_) => 'NAS',
-        app: (_) => 'App',
-        homeAuto: (_) => 'HomeAuto',
-        boxAdmin: (_) => 'BoxAdmin',
-        phone: (_) => 'Phone',
-        unknown: (name, _) => name,
-      );
-
-  void toXml(XmlBuilder builder) => builder
-    ..element('Name', nest: name)
-    ..element('Access', nest: access.index);
+mixin _AccessRightsEquality on XmlEquatable<AccessRights> {
+  @override
+  @visibleForOverriding
+  List<Object?> get props => [self.names, self.accesses];
 }

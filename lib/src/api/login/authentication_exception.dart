@@ -11,8 +11,8 @@ class AuthenticationException
     Object? error,
   ]) = _Status;
 
-  factory AuthenticationException.invalidChallangeFormat() =
-      _InvalidChallangeFormat;
+  factory AuthenticationException.invalidChallengeFormat() =
+      _InvalidChallengeFormat;
 
   factory AuthenticationException.invalidCredentials() = _InvalidCredentials;
 

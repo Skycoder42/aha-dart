@@ -1,61 +1,40 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
-import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
 import 'combined_converter.dart';
 import 'content_type_extractor.dart';
+import 'xml_convertible.dart';
 
-abstract class XmlTypeConverter<T> {
-  const XmlTypeConverter._();
-
-  XmlDocument toXml(T data);
-  T fromXml(XmlDocument xml);
-}
-
-abstract class SimpleXmlTypeConverter<T> implements XmlTypeConverter<T> {
-  const SimpleXmlTypeConverter();
-
-  @override
-  T fromXml(XmlDocument xml) => parseXml(xml.rootElement);
-
-  @override
-  XmlDocument toXml(T data) {
-    final builder = XmlBuilder()..processing('xml', 'version="1.0"');
-    buildXml(data, builder);
-    return builder.buildDocument();
-  }
-
-  @protected
-  void buildXml(T data, XmlBuilder builder);
-
-  @protected
-  T parseXml(XmlElement element);
-}
+typedef XmlFactory<T> = T Function(XmlElement);
 
 class XmlConverter with ContentTypeExtractor implements Converter {
   static const _xmlContentType = 'text/xml';
   static const _allowedXmlContentTypes = [_xmlContentType, 'application/xml'];
 
-  final _typeConverters = <Type, XmlTypeConverter>{
-    XmlDocument: const _XmlDocumentConverter(),
-  };
+  final _xmlFactories = <String, XmlFactory<Object>>{};
 
-  void registerConverter<T>(XmlTypeConverter<T> converter) =>
-      _typeConverters[T] = converter;
+  void registerConverter<T extends XmlConvertible>(
+    String element,
+    XmlFactory<T> fromXmlElement,
+  ) =>
+      _xmlFactories[element] = fromXmlElement;
 
   @override
   FutureOr<Request> convertRequest(Request request) {
-    // ignore: avoid_dynamic_calls
-    final converter = _findConverter<dynamic>(request.body.runtimeType);
-    return request.copyWith(
-      body: converter.toXml(request.body).toXmlString(),
-      headers: {
-        ...request.headers,
-        ContentTypeExtractor.contentTypeHeader: _xmlContentType,
-      },
-    );
+    final dynamic body = request.body;
+    if (body is XmlConvertible) {
+      return request.copyWith(
+        headers: {
+          ...request.headers,
+          contentTypeKey: _xmlContentType,
+        },
+        body: body.toXmlElement().toXmlString(),
+      );
+    }
+
+    return request;
   }
 
   @override
@@ -64,9 +43,19 @@ class XmlConverter with ContentTypeExtractor implements Converter {
   ) {
     _checkContentType(response);
 
-    final converter = _findConverter<BodyType>();
-    return response.copyWith(
-      body: converter.fromXml(XmlDocument.parse(response.bodyString)),
+    final xmlDocument = XmlDocument.parse(response.bodyString);
+    if (BodyType == XmlDocument) {
+      return response.copyWith(body: xmlDocument as BodyType);
+    }
+
+    final rootElement = xmlDocument.rootElement;
+    if (BodyType == XmlElement) {
+      return response.copyWith(body: rootElement as BodyType);
+    }
+
+    final factory = _getFactory<BodyType>(rootElement.name);
+    return response.copyWith<BodyType>(
+      body: factory(rootElement),
     );
   }
 
@@ -80,25 +69,16 @@ class XmlConverter with ContentTypeExtractor implements Converter {
     }
   }
 
-  XmlTypeConverter<T> _findConverter<T>([Type? t]) {
-    final converter = _typeConverters[t ?? T] as XmlTypeConverter<T>?;
-    if (converter == null) {
+  XmlFactory<T> _getFactory<T>(XmlName rootElementName) {
+    final factory = _xmlFactories[rootElementName.local];
+    if (factory == null) {
       throw ConversionNotSupportedException(
         runtimeType.toString(),
-        'Type has not been registered for XML conversion',
+        'Element <${rootElementName.local}> '
+        'has not been registered for XML conversion',
       );
     }
 
-    return converter;
+    return factory as XmlFactory<T>;
   }
-}
-
-class _XmlDocumentConverter implements XmlTypeConverter<XmlDocument> {
-  const _XmlDocumentConverter();
-
-  @override
-  XmlDocument fromXml(XmlDocument xml) => xml;
-
-  @override
-  XmlDocument toXml(XmlDocument data) => data;
 }

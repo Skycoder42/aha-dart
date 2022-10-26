@@ -1,36 +1,53 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
+import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-part 'user.freezed.dart';
+import '../../util/xml_convertible.dart';
 
-@freezed
-class User with _$User {
-  const User._();
+part 'user.g.dart';
 
-  // ignore: sort_unnamed_constructors_first
-  const factory User(
-    String user, {
-    @Default(false) bool last,
-  }) = _User;
+@xml.XmlSerializable(createMixin: true)
+@immutable
+class User extends XmlEquatable<User>
+    with _$UserXmlSerializableMixin, _UserEquality {
+  @xml.XmlText()
+  final String user;
 
-  factory User.fromXml(XmlElement element) {
-    assert(
-      element.name.toString() == 'User',
-      'element must be a <User> element.',
-    );
-    return User(
-      element.text,
-      last: element.getAttribute('last') == '1',
-    );
-  }
+  @xml.XmlAttribute()
+  final bool? last;
 
-  void toXml(XmlBuilder builder) {
-    builder.element(
-      'User',
-      attributes: {
-        if (last) 'last': '1',
-      },
-      nest: user,
-    );
-  }
+  const User({
+    required this.user,
+    this.last = false,
+  });
+
+  factory User.fromXmlElement(XmlElement element) =>
+      _$UserFromXmlElement(element);
+}
+
+mixin _UserEquality on XmlEquatable<User> {
+  @override
+  @visibleForOverriding
+  List<Object?> get props => [self.user, self.last];
+}
+
+@xml.XmlSerializable(createMixin: true)
+@immutable
+class Users extends XmlEquatable<Users>
+    with _$UsersXmlSerializableMixin, _UsersEquality {
+  @xml.XmlElement(name: 'User')
+  final List<User> users;
+
+  const Users({
+    required this.users,
+  });
+
+  factory Users.fromXmlElement(XmlElement element) =>
+      _$UsersFromXmlElement(element);
+}
+
+mixin _UsersEquality on XmlEquatable<Users> {
+  @override
+  @visibleForOverriding
+  List<Object?> get props => [self.users];
 }

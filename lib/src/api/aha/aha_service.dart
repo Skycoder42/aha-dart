@@ -1,6 +1,6 @@
 import 'package:chopper/chopper.dart';
-import 'package:xml/xml.dart';
 
+import 'models/device_list.dart';
 import 'models/optional.dart';
 import 'models/switch_status.dart';
 
@@ -15,7 +15,7 @@ abstract class AhaService extends ChopperService {
   // all devices
 
   @Get(path: '$_baseUrl=getdevicelistinfos')
-  Future<Response<XmlDocument>> getDeviceListInfos();
+  Future<Response<DeviceList>> getDeviceListInfos();
 
   // switches
 

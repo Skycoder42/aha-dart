@@ -11,58 +11,44 @@ import 'login_info.dart';
 import 'login_service.dart';
 import 'models/right.dart';
 import 'models/session_info.dart';
+import 'models/sid.dart';
 import 'user_credentials.dart';
 
 // ignore: must_be_immutable
 abstract class LoginManager implements RequestInterceptor, Authenticator {
-  static const _pbkd2Bits = 256;
-  static final _challangeRegexp = RegExp(
+  static const _pbkdf2Bits = 256;
+  static final _challengeRegexp = RegExp(
     r'^2\$(\d+)\$([0-9a-f]+)\$(\d+)\$([0-9a-f]+)$',
     caseSensitive: false,
   );
-
-  var _sid = SessionInfo.invalidSid;
-  var _rights = const <Right>[];
+  var _rights = const AccessRights.empty();
 
   late final LoginService _loginService;
 
-  List<Right> get rights => _rights;
+  Sid sid = const Sid.invalid();
 
-  String get sid => _sid;
-  set sid(String sid) {
-    if (sid.length != 16) {
-      // TODO validate with regexp
-      throw ArgumentError.value(
-        sid,
-        'sid',
-        'must be a 64 bit hex encoded integer',
-      );
-    }
-
-    _sid = sid;
-  }
+  AccessRights get rights => _rights;
 
   Future<void> login() async {
     final sessionInfo = await _getLoginStatus();
-    if (sessionInfo.sid == SessionInfo.invalidSid) {
+    if (!sessionInfo.sid.isValid()) {
       final loginInfo = await _performLogin(sessionInfo, LoginReason.manual);
-
-      if (loginInfo.sid == SessionInfo.invalidSid) {
+      if (!loginInfo.sid.isValid()) {
         throw AuthenticationException.invalidCredentials();
       }
     }
   }
 
   Future<void> logout() async {
-    if (_sid == SessionInfo.invalidSid) {
+    if (!sid.isValid()) {
       return;
     }
 
     final sessionInfo = _extractSessionInfo(
-      await _loginService.logout(sid: _sid),
+      await _loginService.logout(sid.sid),
     );
 
-    if (sessionInfo.sid != SessionInfo.invalidSid) {
+    if (sessionInfo.sid.isValid()) {
       throw AuthenticationException.logoutFailed();
     }
   }
@@ -77,7 +63,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
       return request;
     }
 
-    if (_sid == SessionInfo.invalidSid) {
+    if (!sid.isValid()) {
       await _autoLogin(false);
     }
 
@@ -108,13 +94,13 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
   Request _copyRequestWithSid(Request request) => request.copyWith(
         parameters: <String, dynamic>{
           ...request.parameters,
-          'sid': _sid,
+          'sid': sid.sid,
         },
       );
 
   Future<void> _autoLogin(bool isRefresh) async {
     var sessionInfo = await _getLoginStatus();
-    while (sessionInfo.sid == SessionInfo.invalidSid) {
+    while (!sessionInfo.sid.isValid()) {
       sessionInfo = await _performLogin(
         sessionInfo,
         isRefresh ? LoginReason.refresh : LoginReason.auto,
@@ -123,9 +109,9 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
   }
 
   Future<SessionInfo> _getLoginStatus() async => _extractSessionInfo(
-        _sid == SessionInfo.invalidSid
-            ? await _loginService.getLoginStatus()
-            : await _loginService.checkSessionValid(sid: _sid),
+        sid.isValid()
+            ? await _loginService.checkSessionValid(sid.sid)
+            : await _loginService.getLoginStatus(),
       );
 
   Future<SessionInfo> _performLogin(
@@ -140,7 +126,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
     final credentials = await obtainCredentials(
       LoginInfo(
-        knownUsers: sessionInfo.users,
+        knownUsers: sessionInfo.users.users,
         blockTime: blockDelay,
         reason: reason,
       ),
@@ -149,7 +135,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
       throw AuthenticationException.loginCanceled();
     }
 
-    final response = await _solveVersion2Challange(sessionInfo, credentials);
+    final response = await _solveVersion2Challenge(sessionInfo, credentials);
 
     if (blockTimeout != null) {
       await blockTimeout;
@@ -165,36 +151,36 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     return loginResult;
   }
 
-  Future<String> _solveVersion2Challange(
+  Future<String> _solveVersion2Challenge(
     SessionInfo sessionInfo,
     UserCredentials credentials,
   ) async {
-    final challangeMatch = _challangeRegexp.firstMatch(sessionInfo.challange);
-    if (challangeMatch == null) {
-      throw AuthenticationException.invalidChallangeFormat();
+    final challengeMatch = _challengeRegexp.firstMatch(sessionInfo.challenge);
+    if (challengeMatch == null) {
+      throw AuthenticationException.invalidChallengeFormat();
     }
 
-    final iter1 = int.parse(challangeMatch[1]!);
-    final salt1 = hex.decode(challangeMatch[2]!);
-    final iter2 = int.parse(challangeMatch[3]!);
-    final salt2 = hex.decode(challangeMatch[4]!);
+    final iter1 = int.parse(challengeMatch[1]!);
+    final salt1 = hex.decode(challengeMatch[2]!);
+    final iter2 = int.parse(challengeMatch[3]!);
+    final salt2 = hex.decode(challengeMatch[4]!);
 
-    final pbkdfRound1 = Pbkdf2(
+    final pbkdf2Round1 = Pbkdf2(
       macAlgorithm: Hmac.sha256(),
       iterations: iter1,
-      bits: _pbkd2Bits,
+      bits: _pbkdf2Bits,
     );
-    final pbkdfRound2 = Pbkdf2(
+    final pbkdf2Round2 = Pbkdf2(
       macAlgorithm: Hmac.sha256(),
       iterations: iter2,
-      bits: _pbkd2Bits,
+      bits: _pbkdf2Bits,
     );
 
-    final hash1 = await pbkdfRound1.deriveKey(
+    final hash1 = await pbkdf2Round1.deriveKey(
       secretKey: SecretKey(utf8.encode(credentials.password)),
       nonce: salt1,
     );
-    final hash2 = await pbkdfRound2.deriveKey(
+    final hash2 = await pbkdf2Round2.deriveKey(
       secretKey: hash1,
       nonce: salt2,
     );
@@ -211,8 +197,8 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     }
 
     final sessionInfo = response.body!;
-    _sid = sessionInfo.sid;
-    _rights = sessionInfo.rights;
+    sid = sessionInfo.sid;
+    _rights = sessionInfo.accessRights;
 
     return sessionInfo;
   }
