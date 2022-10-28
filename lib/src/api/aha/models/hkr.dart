@@ -3,12 +3,31 @@ import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
 import '../../util/xml_convertible.dart';
-import 'battery_percentage.dart';
 import 'hkr_temperature.dart';
-import 'hkr_timestamp.dart';
 import 'next_change.dart';
+import 'percentage.dart';
+import 'switch_state.dart';
+import 'timestamp.dart';
 
 part 'hkr.g.dart';
+
+@xml.XmlEnum()
+enum HkrError {
+  @xml.XmlValue('0')
+  noError,
+  @xml.XmlValue('1')
+  incorrectInstallation,
+  @xml.XmlValue('2')
+  incompatibleValveOrLowBattery,
+  @xml.XmlValue('3')
+  valveBlocked,
+  @xml.XmlValue('4')
+  preparingInstallation,
+  @xml.XmlValue('5')
+  installationReady,
+  @xml.XmlValue('6')
+  installationInProgress,
+}
 
 @xml.XmlSerializable(createMixin: true)
 @immutable
@@ -27,31 +46,31 @@ class Hkr extends XmlEquatable<Hkr>
   final HkrTemperatur komfort;
 
   @xml.XmlElement()
-  final bool lock;
+  final SwitchState lock;
 
   @xml.XmlElement(name: 'devicelock')
-  final bool deviceLock;
+  final SwitchState deviceLock;
 
   @xml.XmlElement(name: 'errorcode')
-  final int errorCode;
+  final HkrError errorCode;
 
   @xml.XmlElement(name: 'windowopenactiv')
   final bool windowOpenActive;
 
   @xml.XmlElement(name: 'windowopenactiveendtime')
-  final HkrTimestamp windowOpenActiveEndTime;
+  final Timestamp windowOpenActiveEndTime;
 
   @xml.XmlElement(name: 'boostactive')
   final bool boostActive;
 
   @xml.XmlElement(name: 'boostactiveendtime')
-  final HkrTimestamp boostActiveEndTime;
+  final Timestamp boostActiveEndTime;
 
   @xml.XmlElement(name: 'batterylow')
   final bool batteryLow;
 
   @xml.XmlElement()
-  final BatteryPercentage battery;
+  final Percentage battery;
 
   @xml.XmlElement(name: 'nextchange')
   final NextChange nextChange;

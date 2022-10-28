@@ -8,8 +8,10 @@ environment:
 
 dependencies:
   chopper: ^5.1.0
+  color: ^3.0.0
   convert: ^3.1.1
   cryptography: ^2.0.5
+  enum_flag: ^1.0.1
   equatable: ^2.0.5
   freezed_annotation: ^2.2.0
   http: ^0.13.5
@@ -24,11 +26,7 @@ dev_dependencies:
   dart_test_tools: ^4.5.3+1
   freezed: ^2.2.1
   test: ^1.21.6
-  xml_serializable:
-    git:
-      url: https://github.com/tnc1997/dart-xml-serializable.git
-      ref: fix/25
-      path: xml_serializable
+  xml_serializable: ^2.2.1
 
 dart_pre_commit:
   lib-exports: false

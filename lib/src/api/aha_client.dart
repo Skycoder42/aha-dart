@@ -3,12 +3,10 @@ import 'package:http/http.dart';
 
 import 'aha/aha_service.dart';
 import 'aha/models/device_list.dart';
-import 'aha/models/switch_status.dart';
 import 'login/login_manager.dart';
 import 'login/login_service.dart';
 import 'login/models/session_info.dart';
 import 'util/combined_converter.dart';
-import 'util/text_converter.dart';
 import 'util/xml_converter.dart';
 
 class AhaClient {
@@ -40,7 +38,6 @@ class AhaClient {
                 deviceListElementName,
                 DeviceList.fromXmlElement,
               ),
-            TextConverter()..registerConverter(SwitchStatus.converter),
           ]),
           interceptors: <dynamic>[
             loginManager,

@@ -26,15 +26,19 @@ class Temperature extends XmlEquatable<Temperature>
   factory Temperature.fromXmlElement(XmlElement element) =>
       _$TemperatureFromXmlElement(element);
 
-  double celsiusValue() => (celsius ?? 0) / 10;
+  double getTemperatureCelsius() => (celsius ?? 0) / 10;
 
-  double offsetValue() => (offset ?? 0) / 10;
+  double getOffsetCelsius() => (offset ?? 0) / 10;
 
   @override
-  String toString() => '${celsiusValue()}°C (Offset: ${offsetValue()}°C)';
+  String toString() =>
+      '${getTemperatureCelsius()}°C (Offset: ${getOffsetCelsius()}°C)';
 }
 
 mixin _TemperatureEquality on XmlEquatable<Temperature> {
   @override
-  List<Object?> get props => [self.celsiusValue(), self.offsetValue()];
+  List<Object?> get props => [
+        self.getTemperatureCelsius(),
+        self.getOffsetCelsius(),
+      ];
 }

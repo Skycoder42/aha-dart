@@ -1,4 +1,4 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
@@ -7,6 +7,8 @@ import 'alert.dart';
 import 'avm_button.dart';
 import 'button.dart';
 import 'color_control.dart';
+import 'device.dart';
+import 'group_info.dart';
 import 'hkr.dart';
 import 'level_control.dart';
 import 'percentage.dart';
@@ -15,78 +17,108 @@ import 'simple_on_off.dart';
 import 'switch.dart';
 import 'temperature.dart';
 
-part 'device.g.dart';
+part 'group.g.dart';
 
 @xml.XmlSerializable(createMixin: true)
 @immutable
-class Device extends XmlEquatable<Device>
-    with _$DeviceXmlSerializableMixin, DeviceEquality {
+class Group extends XmlEquatable<Device>
+    with
+        _$GroupXmlSerializableMixin,
+        DeviceEquality,
+        _GroupEquality
+    implements
+        // ignore: avoid_implementing_value_types
+        Device {
+  @override
   @xml.XmlAttribute()
   final int id;
 
+  @override
   @xml.XmlAttribute()
   final String identifier;
 
+  @override
   @xml.XmlAttribute(name: 'fwversion')
   final String fwVersion;
 
+  @override
   @xml.XmlAttribute()
   final String manufacturer;
 
+  @override
   @xml.XmlAttribute(name: 'productname')
   final String productName;
 
+  @override
   @xml.XmlAttribute(name: 'functionbitmask')
   final int functionBitMask;
 
+  @override
   @xml.XmlElement()
   final bool present;
 
+  @override
   @xml.XmlElement(name: 'txbusy')
   final bool txBusy;
 
+  @override
   @xml.XmlElement()
   final String name;
 
+  @override
   @xml.XmlElement()
   final Percentage? battery;
 
+  @override
   @xml.XmlElement(name: 'batterylow')
   final bool? batteryLow;
 
+  @override
   @xml.XmlElement(name: 'switch')
   final Switch? $switch;
 
+  @override
   @xml.XmlElement(name: 'powermeter')
   final PowerMeter? powerMeter;
 
+  @override
   @xml.XmlElement(name: 'temperature')
   final Temperature? temperature;
 
+  @override
   @xml.XmlElement()
   final Alert? alert;
 
+  @override
   @xml.XmlElement(name: 'button')
   final List<Button>? buttons;
 
+  @override
   @xml.XmlElement(name: 'avmbutton')
   final AvmButton? avmButton;
 
   // TODO HAN-FUN devices
 
+  @override
   @xml.XmlElement(name: 'simpleonoff')
   final SimpleOnOff? simpleOnOff;
 
+  @override
   @xml.XmlElement(name: 'levelcontrol')
   final LevelControl? levelControl;
 
+  @override
   @xml.XmlElement(name: 'colorcontrol')
   final ColorControl? colorControl;
 
+  @override
   @xml.XmlElement(name: 'hkr')
   final Hkr? hkr;
 
-  const Device({
+  @xml.XmlElement(name: 'groupinfo')
+  final GroupInfo groupInfo;
+
+  const Group({
     required this.id,
     required this.identifier,
     required this.functionBitMask,
@@ -108,36 +140,21 @@ class Device extends XmlEquatable<Device>
     required this.levelControl,
     required this.colorControl,
     required this.hkr,
+    required this.groupInfo,
   });
 
-  factory Device.fromXmlElement(XmlElement element) =>
-      _$DeviceFromXmlElement(element);
+  factory Group.fromXmlElement(XmlElement element) =>
+      _$GroupFromXmlElement(element);
 }
 
-@internal
-mixin DeviceEquality on XmlEquatable<Device> {
+mixin _GroupEquality on DeviceEquality {
+  @override
+  @protected
+  Group get self => this as Group;
+
   @override
   List<Object?> get props => [
-        self.id,
-        self.identifier,
-        self.functionBitMask,
-        self.fwVersion,
-        self.manufacturer,
-        self.productName,
-        self.present,
-        self.txBusy,
-        self.name,
-        self.battery,
-        self.batteryLow,
-        self.$switch,
-        self.powerMeter,
-        self.temperature,
-        self.alert,
-        self.buttons,
-        self.avmButton,
-        self.simpleOnOff,
-        self.levelControl,
-        self.colorControl,
-        self.hkr,
+        ...super.props,
+        self.groupInfo,
       ];
 }

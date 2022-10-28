@@ -4,7 +4,7 @@ import 'package:xml_annotation/xml_annotation.dart' as xml;
 
 import '../../util/xml_convertible.dart';
 import 'hkr_temperature.dart';
-import 'hkr_timestamp.dart';
+import 'timestamp.dart';
 
 part 'next_change.g.dart';
 
@@ -13,7 +13,7 @@ part 'next_change.g.dart';
 class NextChange extends XmlEquatable<NextChange>
     with _$NextChangeXmlSerializableMixin, _NextChangeEquality {
   @xml.XmlElement(name: 'endperiod')
-  final HkrTimestamp endPeriod;
+  final Timestamp endPeriod;
 
   @xml.XmlElement(name: 'tchange')
   final HkrTemperatur tChange;
