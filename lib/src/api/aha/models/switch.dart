@@ -7,6 +7,7 @@ import 'switch_state.dart';
 
 part 'switch.g.dart';
 
+@xml.XmlEnum()
 enum SwitchMode {
   auto,
   manuell,
