@@ -1,29 +1,24 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'simple_on_off.freezed.dart';
 part 'simple_on_off.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class SimpleOnOff extends XmlEquatable<SimpleOnOff>
-    with _$SimpleOnOffXmlSerializableMixin, _SimpleOnOffEquality {
-  @xml.XmlElement()
-  final bool state;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class SimpleOnOff with _$SimpleOnOff implements IXmlSerializable {
+  static const off = SimpleOnOff();
+  static const on = SimpleOnOff(state: true);
 
-  const SimpleOnOff({
-    required this.state,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_SimpleOnOffXmlSerializableMixin')
+  const factory SimpleOnOff({
+    @xml.XmlElement() @Default(false) bool state,
+  }) = _SimpleOnOff;
 
   factory SimpleOnOff.fromXmlElement(XmlElement element) =>
-      _$SimpleOnOffFromXmlElement(element);
-}
-
-mixin _SimpleOnOffEquality on XmlEquatable<SimpleOnOff> {
-  @override
-  List<Object?> get props => [
-        self.state,
-      ];
+      _$_$_SimpleOnOffFromXmlElement(element);
 }

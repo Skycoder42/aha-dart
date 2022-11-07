@@ -1,10 +1,11 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'timestamp.dart';
 
+part 'alert.freezed.dart';
 part 'alert.g.dart';
 
 @xml.XmlEnum()
@@ -26,29 +27,20 @@ enum AlertState {
   const AlertState(this.hasAlert);
 }
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Alert extends XmlEquatable<Alert>
-    with _$AlertXmlSerializableMixin, _AlertEquality {
-  @xml.XmlElement()
-  final AlertState state;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Alert with _$Alert implements IXmlSerializable {
+  static const invalid = Alert();
 
-  @xml.XmlElement(name: 'lastalertchgtimestamp')
-  final Timestamp lastAlertChgTimestamp;
-
-  const Alert({
-    required this.state,
-    required this.lastAlertChgTimestamp,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_AlertXmlSerializableMixin')
+  const factory Alert({
+    @xml.XmlElement() @Default(AlertState.unknown) AlertState state,
+    @xml.XmlElement(name: 'lastalertchgtimestamp')
+    @Default(Timestamp.invalid)
+        Timestamp lastAlertChgTimestamp,
+  }) = _Alert;
 
   factory Alert.fromXmlElement(XmlElement element) =>
-      _$AlertFromXmlElement(element);
-}
-
-mixin _AlertEquality on XmlEquatable<Alert> {
-  @override
-  List<Object?> get props => [
-        self.state,
-        self.lastAlertChgTimestamp,
-      ];
+      _$_$_AlertFromXmlElement(element);
 }

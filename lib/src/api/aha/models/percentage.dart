@@ -1,72 +1,41 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'percentage.freezed.dart';
 part 'percentage.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Percentage extends XmlEquatable<Percentage>
-    with _$PercentageXmlSerializableMixin, _PercentageEquality {
-  @xml.XmlText()
-  @visibleForTesting
-  final int rawValue;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Percentage with _$Percentage implements IXmlSerializable {
+  static const _invalidPercentageValue = -9999;
 
-  const Percentage({
-    required this.rawValue,
-  }) : assert(
-          rawValue >= 0 && rawValue <= 100,
-          'rawValue must be in range [0, 100]',
-        );
+  static const invalid = Percentage();
+
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_PercentageXmlSerializableMixin')
+  @Assert(
+    '(rawValue >= 0 && rawValue <= 100) '
+        '|| rawValue == Percentage._invalidPercentageValue',
+    'rawValue must be in range [0, 100] or $_invalidPercentageValue',
+  )
+  const factory Percentage({
+    @xml.XmlText()
+    @Default(Percentage._invalidPercentageValue)
+    @visibleForTesting
+        int rawValue,
+  }) = _Percentage;
 
   factory Percentage.fromXmlElement(XmlElement element) =>
-      _$PercentageFromXmlElement(element);
+      _$_$_PercentageFromXmlElement(element);
 
-  double getPercentage() => rawValue / 100;
-
-  @override
-  String toString() => '$rawValue%';
-}
-
-mixin _PercentageEquality on XmlEquatable<Percentage> {
-  @override
-  List<Object?> get props => [self.getPercentage()];
-}
-
-const _invalidPercentageValue = -9999;
-
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class OptionalPercentage extends XmlEquatable<Percentage>
-    with
-        _$OptionalPercentageXmlSerializableMixin,
-        _PercentageEquality
-    implements
-        // ignore: avoid_implementing_value_types
-        Percentage {
-  @override
-  @xml.XmlText()
-  @visibleForTesting
-  final int rawValue;
-
-  const OptionalPercentage({
-    required this.rawValue,
-  }) : assert(
-          rawValue == _invalidPercentageValue ||
-              rawValue >= 0 && rawValue <= 100,
-          'rawValue must be in range [0, 100] or $_invalidPercentageValue',
-        );
-
-  factory OptionalPercentage.fromXmlElement(XmlElement element) =>
-      _$OptionalPercentageFromXmlElement(element);
+  const Percentage._();
 
   bool isValid() => rawValue != _invalidPercentageValue;
 
-  @override
-  double getPercentage() =>
-      rawValue != _invalidPercentageValue ? rawValue / 100 : 0;
+  double get value => rawValue != _invalidPercentageValue ? rawValue / 100 : 0;
 
   @override
   String toString() =>

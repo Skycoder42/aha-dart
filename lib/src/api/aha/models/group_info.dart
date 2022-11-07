@@ -1,36 +1,31 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'group_info.freezed.dart';
 part 'group_info.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class GroupInfo extends XmlEquatable<GroupInfo>
-    with _$GroupInfoXmlSerializableMixin, _GroupInfoEquality {
-  @xml.XmlElement(name: 'masterdeviceid')
-  final int masterDeviceId;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class GroupInfo with _$GroupInfo implements IXmlSerializable {
+  static const invalid = GroupInfo();
 
-  @xml.XmlElement()
-  @visibleForTesting
-  final String members;
-
-  const GroupInfo({
-    required this.masterDeviceId,
-    required this.members,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_GroupInfoXmlSerializableMixin')
+  const factory GroupInfo({
+    @xml.XmlElement(name: 'masterdeviceid') @Default(0) int masterDeviceId,
+    @xml.XmlElement(name: 'members')
+    @visibleForTesting
+    @Default('')
+        String rawMembers,
+  }) = _GroupInfo;
 
   factory GroupInfo.fromXmlElement(XmlElement element) =>
-      _$GroupInfoFromXmlElement(element);
+      _$_$_GroupInfoFromXmlElement(element);
 
-  List<int> getMembers() => members.split(',').map(int.parse).toList();
-}
+  const GroupInfo._();
 
-mixin _GroupInfoEquality on XmlEquatable<GroupInfo> {
-  @override
-  List<Object?> get props => [
-        self.masterDeviceId,
-      ];
+  List<int> get members => rawMembers.split(',').map(int.parse).toList();
 }

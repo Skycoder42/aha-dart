@@ -2,55 +2,34 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'right.dart';
 import 'sid.dart';
 import 'user.dart';
 
+part 'session_info.freezed.dart';
 part 'session_info.g.dart';
 
-const sessionInfoElementName = 'SessionInfo';
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class SessionInfo with _$SessionInfo implements IXmlConvertible {
+  static const elementName = 'SessionInfo';
 
-@xml.XmlSerializable(createMixin: true)
-@xml.XmlRootElement(name: sessionInfoElementName)
-@immutable
-class SessionInfo extends XmlConvertible<SessionInfo>
-    with _$SessionInfoXmlSerializableMixin, _SessionInfoEquality {
-  @xml.XmlElement(name: 'SID')
-  final Sid sid;
+  static const invalid = SessionInfo();
 
-  @xml.XmlElement(name: 'Challenge')
-  final String challenge;
-
-  @xml.XmlElement(name: 'BlockTime')
-  final int blockTime;
-
-  @xml.XmlElement(name: 'Users')
-  final Users users;
-
-  @xml.XmlElement(name: 'Rights')
-  final AccessRights accessRights;
-
-  const SessionInfo({
-    required this.sid,
-    required this.challenge,
-    required this.blockTime,
-    required this.users,
-    required this.accessRights,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @xml.XmlRootElement(name: SessionInfo.elementName)
+  @With.fromString(r'_$_$_SessionInfoXmlSerializableMixin')
+  const factory SessionInfo({
+    @xml.XmlElement(name: 'SID') @Default(Sid.invalid) Sid sid,
+    @xml.XmlElement(name: 'Challenge') @Default('') String challenge,
+    @xml.XmlElement(name: 'BlockTime') @Default(0) int blockTime,
+    @xml.XmlElement(name: 'Users') @Default(Users.empty) Users users,
+    @xml.XmlElement(name: 'Rights')
+    @Default(AccessRights.empty)
+        AccessRights accessRights,
+  }) = _SessionInfo;
 
   factory SessionInfo.fromXmlElement(XmlElement element) =>
-      _$SessionInfoFromXmlElement(element);
-}
-
-mixin _SessionInfoEquality on XmlConvertible<SessionInfo> {
-  @override
-  @visibleForOverriding
-  List<Object?> get props => [
-        self.sid,
-        self.challenge,
-        self.blockTime,
-        self.users,
-        self.accessRights,
-      ];
+      _$_$_SessionInfoFromXmlElement(element);
 }

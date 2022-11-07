@@ -1,44 +1,35 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'temperature.freezed.dart';
 part 'temperature.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Temperature extends XmlEquatable<Temperature>
-    with _$TemperatureXmlSerializableMixin, _TemperatureEquality {
-  @xml.XmlElement()
-  @visibleForTesting
-  final int? celsius;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Temperature with _$Temperature implements IXmlSerializable {
+  static const invalid = Temperature();
 
-  @xml.XmlElement()
-  @visibleForTesting
-  final int? offset;
-
-  const Temperature({
-    required this.celsius,
-    required this.offset,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_TemperatureXmlSerializableMixin')
+  const factory Temperature({
+    @xml.XmlElement(name: 'celsius') @visibleForTesting int? rawCelsius,
+    @xml.XmlElement(name: 'offset') @visibleForTesting int? rawOffset,
+  }) = _Temperature;
 
   factory Temperature.fromXmlElement(XmlElement element) =>
-      _$TemperatureFromXmlElement(element);
+      _$_$_TemperatureFromXmlElement(element);
 
-  double getTemperatureCelsius() => (celsius ?? 0) / 10;
+  const Temperature._();
 
-  double getOffsetCelsius() => (offset ?? 0) / 10;
+  /// The temperature in celsius
+  double get temperature => (rawCelsius ?? 0) / 10;
+
+  /// The temperature offset in celsius
+  double get offset => (rawOffset ?? 0) / 10;
 
   @override
-  String toString() =>
-      '${getTemperatureCelsius()}°C (Offset: ${getOffsetCelsius()}°C)';
-}
-
-mixin _TemperatureEquality on XmlEquatable<Temperature> {
-  @override
-  List<Object?> get props => [
-        self.getTemperatureCelsius(),
-        self.getOffsetCelsius(),
-      ];
+  String toString() => '$temperature°C (Offset: $offset°C)';
 }

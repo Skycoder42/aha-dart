@@ -1,12 +1,13 @@
 import 'package:color/color.dart';
 import 'package:enum_flag/enum_flag.dart';
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'level_control.dart';
 
+part 'color_control.freezed.dart';
 part 'color_control.g.dart';
 
 @xml.XmlEnum()
@@ -23,37 +24,27 @@ enum ColorControlMode with EnumFlag {
   unknown,
 }
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class ColorControl extends XmlEquatable<ColorControl>
-    with _$ColorControlXmlSerializableMixin, _ColorControlEquality {
-  @xml.XmlAttribute(name: 'supported_modes')
-  final int supportedModes;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class ColorControl with _$ColorControl implements IXmlSerializable {
+  static const invalid = ColorControl();
 
-  @xml.XmlAttribute(name: 'current_mode')
-  final ColorControlMode currentMode;
-
-  @xml.XmlElement()
-  @visibleForTesting
-  final String? hue;
-
-  @xml.XmlElement()
-  @visibleForTesting
-  final String? saturation;
-
-  @xml.XmlElement(name: 'temperature')
-  final int? temperatureKelvin;
-
-  const ColorControl({
-    required this.supportedModes,
-    required this.currentMode,
-    required this.hue,
-    required this.saturation,
-    required this.temperatureKelvin,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_ColorControlXmlSerializableMixin')
+  const factory ColorControl({
+    @xml.XmlAttribute(name: 'supported_modes') @Default(0) int supportedModes,
+    @xml.XmlAttribute(name: 'current_mode')
+    @Default(ColorControlMode.unknown)
+        ColorControlMode currentMode,
+    @xml.XmlElement() @visibleForTesting String? hue,
+    @xml.XmlElement() @visibleForTesting String? saturation,
+    @xml.XmlElement(name: 'temperature') int? temperatureKelvin,
+  }) = _ColorControl;
 
   factory ColorControl.fromXmlElement(XmlElement element) =>
-      _$ColorControlFromXmlElement(element);
+      _$_$_ColorControlFromXmlElement(element);
+
+  const ColorControl._();
 
   HsvColor? getColor([LevelControl? levelControl]) {
     if (hue == null || saturation == null) {
@@ -63,18 +54,7 @@ class ColorControl extends XmlEquatable<ColorControl>
     return HsvColor(
       int.parse(hue!),
       int.parse(saturation!) / 255 * 100,
-      (levelControl?.levelPercentage.getPercentage() ?? 1.0) * 100,
+      (levelControl?.levelPercentage.value ?? 1.0) * 100,
     );
   }
-}
-
-mixin _ColorControlEquality on XmlEquatable<ColorControl> {
-  @override
-  List<Object?> get props => [
-        self.supportedModes,
-        self.currentMode,
-        self.hue,
-        self.saturation,
-        self.temperatureKelvin,
-      ];
 }

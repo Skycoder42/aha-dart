@@ -21,26 +21,26 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     r'^2\$(\d+)\$([0-9a-f]+)\$(\d+)\$([0-9a-f]+)$',
     caseSensitive: false,
   );
-  var _rights = const AccessRights.empty();
+  var _rights = AccessRights.empty;
 
   late final LoginService _loginService;
 
-  Sid sid = const Sid.invalid();
+  Sid sid = Sid.invalid;
 
   AccessRights get rights => _rights;
 
   Future<void> login() async {
     final sessionInfo = await _getLoginStatus();
-    if (!sessionInfo.sid.isValid()) {
+    if (!sessionInfo.sid.isValid) {
       final loginInfo = await _performLogin(sessionInfo, LoginReason.manual);
-      if (!loginInfo.sid.isValid()) {
+      if (!loginInfo.sid.isValid) {
         throw AuthenticationException.invalidCredentials();
       }
     }
   }
 
   Future<void> logout() async {
-    if (!sid.isValid()) {
+    if (!sid.isValid) {
       return;
     }
 
@@ -48,7 +48,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
       await _loginService.logout(sid.sid),
     );
 
-    if (sessionInfo.sid.isValid()) {
+    if (sessionInfo.sid.isValid) {
       throw AuthenticationException.logoutFailed();
     }
   }
@@ -63,7 +63,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
       return request;
     }
 
-    if (!sid.isValid()) {
+    if (!sid.isValid) {
       await _autoLogin(false);
     }
 
@@ -100,7 +100,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
   Future<void> _autoLogin(bool isRefresh) async {
     var sessionInfo = await _getLoginStatus();
-    while (!sessionInfo.sid.isValid()) {
+    while (!sessionInfo.sid.isValid) {
       sessionInfo = await _performLogin(
         sessionInfo,
         isRefresh ? LoginReason.refresh : LoginReason.auto,
@@ -109,7 +109,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
   }
 
   Future<SessionInfo> _getLoginStatus() async => _extractSessionInfo(
-        sid.isValid()
+        sid.isValid
             ? await _loginService.checkSessionValid(sid.sid)
             : await _loginService.getLoginStatus(),
       );
@@ -126,7 +126,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
     final credentials = await obtainCredentials(
       LoginInfo(
-        knownUsers: sessionInfo.users.users,
+        knownUsers: sessionInfo.users.users ?? const [],
         blockTime: blockDelay,
         reason: reason,
       ),

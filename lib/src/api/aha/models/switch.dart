@@ -1,51 +1,35 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'switch_state.dart';
 
+part 'switch.freezed.dart';
 part 'switch.g.dart';
 
 @xml.XmlEnum()
 enum SwitchMode {
-  auto,
   manuell,
+  auto,
 }
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Switch extends XmlEquatable<Switch>
-    with _$SwitchXmlSerializableMixin, _SwitchEquality {
-  @xml.XmlElement()
-  final SwitchState state;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Switch with _$Switch implements IXmlSerializable {
+  static const invalid = Switch();
 
-  @xml.XmlElement()
-  final SwitchMode mode;
-
-  @xml.XmlElement()
-  final SwitchState lock;
-
-  @xml.XmlElement(name: 'devicelock')
-  final SwitchState deviceLock;
-
-  const Switch({
-    required this.state,
-    required this.mode,
-    required this.lock,
-    required this.deviceLock,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_SwitchXmlSerializableMixin')
+  const factory Switch({
+    @xml.XmlElement() @Default(SwitchState.invalid) SwitchState state,
+    @xml.XmlElement() @Default(SwitchMode.manuell) SwitchMode mode,
+    @xml.XmlElement() @Default(SwitchState.invalid) SwitchState lock,
+    @xml.XmlElement(name: 'devicelock')
+    @Default(SwitchState.invalid)
+        SwitchState deviceLock,
+  }) = _Switch;
 
   factory Switch.fromXmlElement(XmlElement element) =>
-      _$SwitchFromXmlElement(element);
-}
-
-mixin _SwitchEquality on XmlEquatable<Switch> {
-  @override
-  List<Object?> get props => [
-        self.state,
-        self.mode,
-        self.lock,
-        self.deviceLock,
-      ];
+      _$_$_SwitchFromXmlElement(element);
 }

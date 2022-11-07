@@ -31,11 +31,11 @@ class AhaClient {
           converter: CombinedConverter([
             XmlConverter()
               ..registerConverter(
-                sessionInfoElementName,
+                SessionInfo.elementName,
                 SessionInfo.fromXmlElement,
               )
               ..registerConverter(
-                deviceListElementName,
+                DeviceList.elementName,
                 DeviceList.fromXmlElement,
               ),
           ]),

@@ -2,52 +2,38 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'user.freezed.dart';
 part 'user.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class User extends XmlEquatable<User>
-    with _$UserXmlSerializableMixin, _UserEquality {
-  @xml.XmlText()
-  final String user;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class User with _$User implements IXmlSerializable {
+  static const invalid = User();
 
-  @xml.XmlAttribute()
-  final bool? last;
-
-  const User({
-    required this.user,
-    this.last = false,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_UserXmlSerializableMixin')
+  const factory User({
+    @xml.XmlText() @Default('') String user,
+    @xml.XmlAttribute() @Default(false) bool? last,
+  }) = _User;
 
   factory User.fromXmlElement(XmlElement element) =>
-      _$UserFromXmlElement(element);
+      _$_$_UserFromXmlElement(element);
 }
 
-mixin _UserEquality on XmlEquatable<User> {
-  @override
-  @visibleForOverriding
-  List<Object?> get props => [self.user, self.last];
-}
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Users with _$Users implements IXmlSerializable {
+  static const empty = Users();
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Users extends XmlEquatable<Users>
-    with _$UsersXmlSerializableMixin, _UsersEquality {
-  @xml.XmlElement(name: 'User')
-  final List<User> users;
-
-  const Users({
-    required this.users,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_UsersXmlSerializableMixin')
+  const factory Users({
+    @xml.XmlElement() @Default(<User>[]) List<User>? users,
+  }) = _Users;
 
   factory Users.fromXmlElement(XmlElement element) =>
-      _$UsersFromXmlElement(element);
-}
-
-mixin _UsersEquality on XmlEquatable<Users> {
-  @override
-  @visibleForOverriding
-  List<Object?> get props => [self.users];
+      _$_$_UsersFromXmlElement(element);
 }

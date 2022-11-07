@@ -2,11 +2,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'alert.dart';
 import 'avm_button.dart';
 import 'button.dart';
 import 'color_control.dart';
+import 'group_info.dart';
 import 'hkr.dart';
 import 'level_control.dart';
 import 'percentage.dart';
@@ -15,129 +16,93 @@ import 'simple_on_off.dart';
 import 'switch.dart';
 import 'temperature.dart';
 
+part 'device.freezed.dart';
 part 'device.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Device extends XmlEquatable<Device>
-    with _$DeviceXmlSerializableMixin, DeviceEquality {
-  @xml.XmlAttribute()
-  final int id;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Device with _$Device implements IXmlSerializable {
+  static const deviceElementName = 'device';
+  static const groupElementName = 'group';
 
-  @xml.XmlAttribute()
-  final String identifier;
+  static const invalidDevice = Device();
+  static const invalidGroup = DeviceGroup();
 
-  @xml.XmlAttribute(name: 'fwversion')
-  final String fwVersion;
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_DeviceXmlSerializableMixin')
+  const factory Device({
+    @xml.XmlAttribute() @Default(0) int id,
+    @xml.XmlAttribute() @Default('') String identifier,
+    @xml.XmlAttribute(name: 'fwversion') @Default('') String fwVersion,
+    @xml.XmlAttribute() @Default('') String manufacturer,
+    @xml.XmlAttribute(name: 'productname') @Default('') String productName,
+    @xml.XmlAttribute(name: 'functionbitmask') @Default(0) int functionBitMask,
+    @xml.XmlElement() @Default(false) bool present,
+    @xml.XmlElement(name: 'txbusy') @Default(false) bool txBusy,
+    @xml.XmlElement() @Default('') String name,
+    @xml.XmlElement() Percentage? battery,
+    @xml.XmlElement(name: 'batterylow') bool? batteryLow,
+    @xml.XmlElement(name: 'switch') Switch? switch_,
+    @xml.XmlElement(name: 'powermeter') PowerMeter? powerMeter,
+    @xml.XmlElement(name: 'temperature') Temperature? temperature,
+    @xml.XmlElement() Alert? alert,
+    @xml.XmlElement(name: 'button') List<Button>? buttons,
+    @xml.XmlElement(name: 'avmbutton') AvmButton? avmButton,
 
-  @xml.XmlAttribute()
-  final String manufacturer;
+    // TODO HAN-FUN devices
 
-  @xml.XmlAttribute(name: 'productname')
-  final String productName;
+    @xml.XmlElement(name: 'simpleonoff') SimpleOnOff? simpleOnOff,
+    @xml.XmlElement(name: 'levelcontrol') LevelControl? levelControl,
+    @xml.XmlElement(name: 'colorcontrol') ColorControl? colorControl,
+    @xml.XmlElement(name: 'hkr') Hkr? hkr,
+  }) = _Device;
 
-  @xml.XmlAttribute(name: 'functionbitmask')
-  final int functionBitMask;
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$DeviceGroupXmlSerializableMixin')
+  const factory Device.group({
+    @xml.XmlAttribute() @Default(0) int id,
+    @xml.XmlAttribute() @Default('') String identifier,
+    @xml.XmlAttribute(name: 'fwversion') @Default('') String fwVersion,
+    @xml.XmlAttribute() @Default('') String manufacturer,
+    @xml.XmlAttribute(name: 'productname') @Default('') String productName,
+    @xml.XmlAttribute(name: 'functionbitmask') @Default(0) int functionBitMask,
+    @xml.XmlElement() @Default(false) bool present,
+    @xml.XmlElement(name: 'txbusy') @Default(false) bool txBusy,
+    @xml.XmlElement() @Default('') String name,
+    @xml.XmlElement() Percentage? battery,
+    @xml.XmlElement(name: 'batterylow') bool? batteryLow,
+    @xml.XmlElement(name: 'switch') Switch? switch_,
+    @xml.XmlElement(name: 'powermeter') PowerMeter? powerMeter,
+    @xml.XmlElement(name: 'temperature') Temperature? temperature,
+    @xml.XmlElement() Alert? alert,
+    @xml.XmlElement(name: 'button') List<Button>? buttons,
+    @xml.XmlElement(name: 'avmbutton') AvmButton? avmButton,
 
-  @xml.XmlElement()
-  final bool present;
+    // TODO HAN-FUN devices
 
-  @xml.XmlElement(name: 'txbusy')
-  final bool txBusy;
+    @xml.XmlElement(name: 'simpleonoff') SimpleOnOff? simpleOnOff,
+    @xml.XmlElement(name: 'levelcontrol') LevelControl? levelControl,
+    @xml.XmlElement(name: 'colorcontrol') ColorControl? colorControl,
+    @xml.XmlElement(name: 'hkr') Hkr? hkr,
 
-  @xml.XmlElement()
-  final String name;
+    // groups specific, all before is identical
+    @xml.XmlElement(name: 'groupinfo')
+    @Default(GroupInfo.invalid)
+        GroupInfo groupInfo,
+  }) = DeviceGroup;
 
-  @xml.XmlElement()
-  final Percentage? battery;
-
-  @xml.XmlElement(name: 'batterylow')
-  final bool? batteryLow;
-
-  @xml.XmlElement(name: 'switch')
-  final Switch? $switch;
-
-  @xml.XmlElement(name: 'powermeter')
-  final PowerMeter? powerMeter;
-
-  @xml.XmlElement(name: 'temperature')
-  final Temperature? temperature;
-
-  @xml.XmlElement()
-  final Alert? alert;
-
-  @xml.XmlElement(name: 'button')
-  final List<Button>? buttons;
-
-  @xml.XmlElement(name: 'avmbutton')
-  final AvmButton? avmButton;
-
-  // TODO HAN-FUN devices
-
-  @xml.XmlElement(name: 'simpleonoff')
-  final SimpleOnOff? simpleOnOff;
-
-  @xml.XmlElement(name: 'levelcontrol')
-  final LevelControl? levelControl;
-
-  @xml.XmlElement(name: 'colorcontrol')
-  final ColorControl? colorControl;
-
-  @xml.XmlElement(name: 'hkr')
-  final Hkr? hkr;
-
-  const Device({
-    required this.id,
-    required this.identifier,
-    required this.functionBitMask,
-    required this.fwVersion,
-    required this.manufacturer,
-    required this.productName,
-    required this.present,
-    required this.txBusy,
-    required this.name,
-    required this.battery,
-    required this.batteryLow,
-    required this.$switch,
-    required this.powerMeter,
-    required this.temperature,
-    required this.alert,
-    required this.buttons,
-    required this.avmButton,
-    required this.simpleOnOff,
-    required this.levelControl,
-    required this.colorControl,
-    required this.hkr,
-  });
-
-  factory Device.fromXmlElement(XmlElement element) =>
-      _$DeviceFromXmlElement(element);
-}
-
-@internal
-mixin DeviceEquality on XmlEquatable<Device> {
-  @override
-  List<Object?> get props => [
-        self.id,
-        self.identifier,
-        self.functionBitMask,
-        self.fwVersion,
-        self.manufacturer,
-        self.productName,
-        self.present,
-        self.txBusy,
-        self.name,
-        self.battery,
-        self.batteryLow,
-        self.$switch,
-        self.powerMeter,
-        self.temperature,
-        self.alert,
-        self.buttons,
-        self.avmButton,
-        self.simpleOnOff,
-        self.levelControl,
-        self.colorControl,
-        self.hkr,
-      ];
+  factory Device.fromXmlElement(XmlElement element) {
+    switch (element.localName) {
+      case deviceElementName:
+        return _$_$_DeviceFromXmlElement(element);
+      case groupElementName:
+        return _$_$DeviceGroupFromXmlElement(element);
+      default:
+        throw ArgumentError.value(
+          element,
+          'element',
+          'Must be a <device> or a <group> element',
+        );
+    }
+  }
 }

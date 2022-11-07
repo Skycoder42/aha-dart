@@ -1,37 +1,30 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'sid.freezed.dart';
 part 'sid.g.dart';
 
-const _invalidSid = '0000000000000000';
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class Sid with _$Sid implements IXmlSerializable {
+  static const _invalidValue = '0000000000000000';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class Sid extends XmlEquatable<Sid>
-    with _$SidXmlSerializableMixin, _SidEquality {
-  @xml.XmlText()
-  final String sid;
+  static const invalid = Sid();
 
-  const Sid({required this.sid})
-      : assert(
-          sid.length == 16,
-          'must be a 64 bit hex encoded integer',
-          // TODO use sid regex
-        );
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_SidXmlSerializableMixin')
+  @Assert('sid.length == 16', 'must be a 64 bit hex encoded integer')
+  const factory Sid({
+    @xml.XmlText() @Default(Sid._invalidValue) String sid,
+  }) = _Sid;
 
-  const Sid.invalid() : sid = _invalidSid;
+  const Sid._();
 
   factory Sid.fromXmlElement(XmlElement element) =>
-      _$SidFromXmlElement(element);
+      _$_$_SidFromXmlElement(element);
 
-  bool isValid() => sid != _invalidSid;
-}
-
-mixin _SidEquality on XmlEquatable<Sid> {
-  @override
-  @visibleForOverriding
-  List<Object?> get props => [self.sid];
+  bool get isValid => sid != _invalidValue;
 }

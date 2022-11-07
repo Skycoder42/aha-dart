@@ -2,8 +2,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
+part 'right.freezed.dart';
 part 'right.g.dart';
 
 @xml.XmlEnum()
@@ -30,32 +31,30 @@ enum AccessLevel {
   write,
 }
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class AccessRights extends XmlEquatable<AccessRights>
-    with _$AccessRightsXmlSerializableMixin, _AccessRightsEquality {
-  @xml.XmlElement(name: 'Name')
-  final List<AccessName>? names;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class AccessRights with _$AccessRights implements IXmlSerializable {
+  static const empty = AccessRights();
 
-  @xml.XmlElement(name: 'Access')
-  final List<AccessLevel>? accesses;
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_AccessRightsXmlSerializableMixin')
+  const factory AccessRights({
+    @xml.XmlElement(name: 'Name') @visibleForTesting List<AccessName>? names,
+    @xml.XmlElement(name: 'Access')
+    @visibleForTesting
+        List<AccessLevel>? accesses,
+  }) = _AccessRights;
 
-  const AccessRights({
-    required this.names,
-    required this.accesses,
-  }) : assert(
-          names?.length == accesses?.length,
-          'names and accesses must have equal lengths',
-        );
-
-  const AccessRights.empty()
-      : names = null,
-        accesses = null;
+  const AccessRights._();
 
   factory AccessRights.fromXmlElement(XmlElement element) =>
-      _$AccessRightsFromXmlElement(element);
+      _$_$_AccessRightsFromXmlElement(element);
 
   AccessLevel getAccessLevelFor(AccessName accessName) {
+    assert(
+      names?.length == accesses?.length,
+      'names and accesses must have equal lengths',
+    );
     final nameIndex = names?.indexOf(accessName) ?? -1;
     if (nameIndex < 0) {
       return AccessLevel.none;
@@ -63,10 +62,4 @@ class AccessRights extends XmlEquatable<AccessRights>
       return accesses?[nameIndex] ?? AccessLevel.none;
     }
   }
-}
-
-mixin _AccessRightsEquality on XmlEquatable<AccessRights> {
-  @override
-  @visibleForOverriding
-  List<Object?> get props => [self.names, self.accesses];
 }

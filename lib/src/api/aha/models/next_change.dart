@@ -1,36 +1,30 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'hkr_temperature.dart';
 import 'timestamp.dart';
 
+part 'next_change.freezed.dart';
 part 'next_change.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class NextChange extends XmlEquatable<NextChange>
-    with _$NextChangeXmlSerializableMixin, _NextChangeEquality {
-  @xml.XmlElement(name: 'endperiod')
-  final Timestamp endPeriod;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class NextChange with _$NextChange implements IXmlSerializable {
+  static const invalid = NextChange();
 
-  @xml.XmlElement(name: 'tchange')
-  final HkrTemperatur tChange;
-
-  const NextChange({
-    required this.endPeriod,
-    required this.tChange,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_NextChangeXmlSerializableMixin')
+  const factory NextChange({
+    @xml.XmlElement(name: 'endperiod')
+    @Default(Timestamp.invalid)
+        Timestamp endPeriod,
+    @xml.XmlElement(name: 'tchange')
+    @Default(HkrTemperature.invalid)
+        HkrTemperature tChange,
+  }) = _NextChange;
 
   factory NextChange.fromXmlElement(XmlElement element) =>
-      _$NextChangeFromXmlElement(element);
-}
-
-mixin _NextChangeEquality on XmlEquatable<NextChange> {
-  @override
-  List<Object?> get props => [
-        self.endPeriod,
-        self.tChange,
-      ];
+      _$_$_NextChangeFromXmlElement(element);
 }

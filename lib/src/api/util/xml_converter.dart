@@ -5,7 +5,7 @@ import 'package:xml/xml.dart';
 
 import 'combined_converter.dart';
 import 'content_type_extractor.dart';
-import 'xml_convertible.dart';
+import 'xml_serializable.dart';
 
 typedef XmlFactory<T> = T Function(XmlElement);
 
@@ -15,7 +15,7 @@ class XmlConverter with ContentTypeExtractor implements Converter {
 
   final _xmlFactories = <String, XmlFactory<Object>>{};
 
-  void registerConverter<T extends XmlConvertible>(
+  void registerConverter<T extends IXmlConvertible>(
     String element,
     XmlFactory<T> fromXmlElement,
   ) =>
@@ -24,7 +24,7 @@ class XmlConverter with ContentTypeExtractor implements Converter {
   @override
   FutureOr<Request> convertRequest(Request request) {
     final dynamic body = request.body;
-    if (body is XmlConvertible) {
+    if (body is IXmlConvertible) {
       return request.copyWith(
         headers: {
           ...request.headers,

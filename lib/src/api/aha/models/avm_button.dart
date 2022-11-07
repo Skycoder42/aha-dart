@@ -1,30 +1,24 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'percentage.dart';
 
+part 'avm_button.freezed.dart';
 part 'avm_button.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class AvmButton extends XmlEquatable<AvmButton>
-    with _$AvmButtonXmlSerializableMixin, _AvmButtonEquality {
-  @xml.XmlElement()
-  final OptionalPercentage humidity;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class AvmButton with _$AvmButton implements IXmlSerializable {
+  static const invalid = AvmButton();
 
-  const AvmButton({
-    required this.humidity,
-  });
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_AvmButtonXmlSerializableMixin')
+  const factory AvmButton({
+    @xml.XmlElement() @Default(Percentage.invalid) Percentage humidity,
+  }) = _AvmButton;
 
   factory AvmButton.fromXmlElement(XmlElement element) =>
-      _$AvmButtonFromXmlElement(element);
-}
-
-mixin _AvmButtonEquality on XmlEquatable<AvmButton> {
-  @override
-  List<Object?> get props => [
-        self.humidity,
-      ];
+      _$_$_AvmButtonFromXmlElement(element);
 }

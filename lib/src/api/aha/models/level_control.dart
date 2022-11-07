@@ -1,38 +1,31 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'percentage.dart';
 
+part 'level_control.freezed.dart';
 part 'level_control.g.dart';
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class LevelControl extends XmlEquatable<LevelControl>
-    with _$LevelControlXmlSerializableMixin, _LevelControlEquality {
-  @xml.XmlElement()
-  final int level;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class LevelControl with _$LevelControl implements IXmlSerializable {
+  static const invalid = LevelControl();
 
-  @xml.XmlElement(name: 'levelpercentage')
-  final Percentage levelPercentage;
-
-  const LevelControl({
-    required this.level,
-    required this.levelPercentage,
-  }) : assert(
-          level >= 0 && level <= 255,
-          'level must be in range [0, 255]',
-        );
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_LevelControlXmlSerializableMixin')
+  @Assert(
+    'level >= 0 && level <= 255',
+    'level must be in range [0, 255]',
+  )
+  const factory LevelControl({
+    @xml.XmlElement() @Default(0) int level,
+    @xml.XmlElement(name: 'levelpercentage')
+    @Default(Percentage.invalid)
+        Percentage levelPercentage,
+  }) = _LevelControl;
 
   factory LevelControl.fromXmlElement(XmlElement element) =>
-      _$LevelControlFromXmlElement(element);
-}
-
-mixin _LevelControlEquality on XmlEquatable<LevelControl> {
-  @override
-  List<Object?> get props => [
-        self.level,
-        self.levelPercentage,
-      ];
+      _$_$_LevelControlFromXmlElement(element);
 }

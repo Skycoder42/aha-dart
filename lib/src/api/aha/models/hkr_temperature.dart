@@ -2,14 +2,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
 part 'hkr_temperature.freezed.dart';
 part 'hkr_temperature.g.dart';
-
-const _offValue = 253;
-const _onValue = 254;
-const _invalidValue = 255;
 
 @freezed
 class HkrTemperatureValue with _$HkrTemperatureValue {
@@ -19,21 +15,32 @@ class HkrTemperatureValue with _$HkrTemperatureValue {
   const factory HkrTemperatureValue.invalid() = _Invalid;
 }
 
-@xml.XmlSerializable(createMixin: true)
-@immutable
-class HkrTemperatur extends XmlEquatable<HkrTemperatur>
-    with _$HkrTemperaturXmlSerializableMixin, _HkrTemperaturEquality {
-  @xml.XmlText()
-  final int rawValue;
+@Freezed(makeCollectionsUnmodifiable: false)
+@xml.XmlSerializable()
+abstract class HkrTemperature
+    with _$HkrTemperature
+    implements IXmlSerializable {
+  static const _offValue = 253;
+  static const _onValue = 254;
+  static const _invalidValue = 255;
 
-  const HkrTemperatur({
-    required this.rawValue,
-  });
+  static const invalid = HkrTemperature();
 
-  factory HkrTemperatur.fromXmlElement(XmlElement element) =>
-      _$HkrTemperaturFromXmlElement(element);
+  @xml.XmlSerializable(createMixin: true)
+  @With.fromString(r'_$_$_HkrTemperatureXmlSerializableMixin')
+  const factory HkrTemperature({
+    @xml.XmlText()
+    @visibleForTesting
+    @Default(HkrTemperature._invalidValue)
+        int rawValue,
+  }) = _HkrTemperature;
 
-  HkrTemperatureValue getValue() {
+  factory HkrTemperature.fromXmlElement(XmlElement element) =>
+      _$_$_HkrTemperatureFromXmlElement(element);
+
+  const HkrTemperature._();
+
+  HkrTemperatureValue get value {
     if (rawValue == _onValue) {
       return const HkrTemperatureValue.on();
     } else if (rawValue == _offValue) {
@@ -46,12 +53,5 @@ class HkrTemperatur extends XmlEquatable<HkrTemperatur>
   }
 
   @override
-  String toString() => getValue().toString();
-}
-
-mixin _HkrTemperaturEquality on XmlEquatable<HkrTemperatur> {
-  @override
-  List<Object?> get props => [
-        self.getValue(),
-      ];
+  String toString() => value.toString();
 }
