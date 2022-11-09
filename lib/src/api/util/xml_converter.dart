@@ -1,48 +1,64 @@
-import 'dart:async';
-
 import 'package:chopper/chopper.dart';
 import 'package:xml/xml.dart';
 
 import 'combined_converter.dart';
-import 'content_type_extractor.dart';
-import 'xml_serializable.dart';
+import 'xml_convertible.dart';
 
-typedef XmlFactory<T> = T Function(XmlElement);
+typedef FromXmlFactory<T> = T Function(XmlElement);
 
-class XmlConverter with ContentTypeExtractor implements Converter {
-  static const _xmlContentType = 'text/xml';
-  static const _allowedXmlContentTypes = [_xmlContentType, 'application/xml'];
+class _XmlConverter<T> {
+  final String rootElementName;
+  final FromXmlFactory<T> fromXmlElement;
 
-  final _xmlFactories = <String, XmlFactory<Object>>{};
+  const _XmlConverter(this.rootElementName, this.fromXmlElement);
+}
 
-  void registerConverter<T extends IXmlConvertible>(
-    String element,
-    XmlFactory<T> fromXmlElement,
-  ) =>
-      _xmlFactories[element] = fromXmlElement;
+class InvalidRootElement implements Exception {
+  final String exceptedElement;
+  final XmlName actualElement;
+
+  InvalidRootElement(this.exceptedElement, this.actualElement);
 
   @override
-  FutureOr<Request> convertRequest(Request request) {
+  String toString() => 'Invalid root element: Expected <$exceptedElement>, '
+      'but was $actualElement';
+}
+
+class XmlConverter extends CombinableConverter {
+  static const _xmlContentType = 'text/xml';
+
+  final _xmlFactories = <Type, _XmlConverter<Object>>{};
+
+  void registerResponseConverter<T extends IXmlConvertible>(
+    String element,
+    FromXmlFactory<T> fromXmlElement,
+  ) =>
+      _xmlFactories[T] = _XmlConverter(element, fromXmlElement);
+
+  @override
+  List<String> get supportedContentTypes =>
+      const [_xmlContentType, 'application/xml'];
+
+  @override
+  Request? maybeConvertRequest(Request request) {
     final dynamic body = request.body;
     if (body is IXmlConvertible) {
-      return request.copyWith(
-        headers: {
-          ...request.headers,
-          contentTypeKey: _xmlContentType,
-        },
+      return _xmlRequest(request).copyWith(
         body: body.toXmlElement().toXmlString(),
       );
+    } else if (body is XmlElement) {
+      return _xmlRequest(request).copyWith(body: body.toXmlString());
+    } else if (body is XmlDocument) {
+      return _xmlRequest(request).copyWith(body: body.toXmlString());
     }
 
-    return request;
+    return null;
   }
 
   @override
-  FutureOr<Response<BodyType>> convertResponse<BodyType, InnerType>(
+  Response<BodyType> convertResponse<BodyType, InnerType>(
     Response response,
   ) {
-    _checkContentType(response);
-
     final xmlDocument = XmlDocument.parse(response.bodyString);
     if (BodyType == XmlDocument) {
       return response.copyWith(body: xmlDocument as BodyType);
@@ -59,26 +75,19 @@ class XmlConverter with ContentTypeExtractor implements Converter {
     );
   }
 
-  void _checkContentType(Response response) {
-    final contentType = getContentType(response.headers);
-    if (!_allowedXmlContentTypes.contains(contentType)) {
-      throw ConversionNotSupportedException(
-        runtimeType.toString(),
-        'Content-Type "$contentType" is not supported',
-      );
-    }
-  }
+  Request _xmlRequest(Request request) =>
+      applyHeader(request, contentTypeKey, _xmlContentType);
 
-  XmlFactory<T> _getFactory<T>(XmlName rootElementName) {
-    final factory = _xmlFactories[rootElementName.local];
+  FromXmlFactory<T> _getFactory<T>(XmlName rootElementName) {
+    final factory = _xmlFactories[T] as _XmlConverter<T>?;
     if (factory == null) {
-      throw ConversionNotSupportedException(
-        runtimeType.toString(),
-        'Element <${rootElementName.local}> '
-        'has not been registered for XML conversion',
-      );
+      throw ConversionNotSupported(T, 'response');
     }
 
-    return factory as XmlFactory<T>;
+    if (rootElementName.local != factory.rootElementName) {
+      throw InvalidRootElement(factory.rootElementName, rootElementName);
+    }
+
+    return factory.fromXmlElement;
   }
 }

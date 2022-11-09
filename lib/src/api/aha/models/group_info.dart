@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/xml_convertible.dart';
 
 part 'group_info.freezed.dart';
 part 'group_info.g.dart';
@@ -17,7 +17,7 @@ abstract class GroupInfo with _$GroupInfo implements IXmlSerializable {
   const factory GroupInfo({
     @xml.XmlElement(name: 'masterdeviceid') @Default(0) int masterDeviceId,
     @xml.XmlElement(name: 'members')
-    @visibleForTesting
+    @visibleForOverriding
     @Default('')
         String rawMembers,
   }) = _GroupInfo;

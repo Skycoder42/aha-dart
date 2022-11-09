@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/xml_convertible.dart';
 
 part 'power_meter.freezed.dart';
 part 'power_meter.g.dart';
@@ -15,13 +15,13 @@ abstract class PowerMeter with _$PowerMeter implements IXmlSerializable {
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_PowerMeterXmlSerializableMixin')
   const factory PowerMeter({
-    @xml.XmlElement(name: 'power') @visibleForTesting @Default(0) int powerRaw,
-    @xml.XmlElement(name: 'energy')
-    @visibleForTesting
-    @Default(0)
-        int energyRaw,
+    /// The power in mW
+    @xml.XmlElement(name: 'power') @Default(0) int power,
+
+    /// The energy in Wh
+    @xml.XmlElement(name: 'energy') @Default(0) int energy,
     @xml.XmlElement(name: 'voltage')
-    @visibleForTesting
+    @visibleForOverriding
     @Default(0)
         int voltageRaw,
   }) = _PowerMeter;
@@ -30,12 +30,6 @@ abstract class PowerMeter with _$PowerMeter implements IXmlSerializable {
       _$_$_PowerMeterFromXmlElement(element);
 
   const PowerMeter._();
-
-  /// The power in watts
-  double get power => powerRaw / 1000;
-
-  /// The energy in watt hours
-  double get energy => energyRaw.toDouble();
 
   /// The energy in voltage
   double get voltage => voltageRaw / 1000;

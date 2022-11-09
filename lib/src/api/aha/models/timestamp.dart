@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/xml_convertible.dart';
 
 part 'timestamp.freezed.dart';
 part 'timestamp.g.dart';
@@ -15,7 +15,7 @@ abstract class Timestamp with _$Timestamp implements IXmlSerializable {
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_TimestampXmlSerializableMixin')
   const factory Timestamp({
-    @xml.XmlText() @Default('0') @visibleForTesting String rawValue,
+    @xml.XmlText() @Default('0') @visibleForOverriding String rawValue,
   }) = _Timestamp;
 
   factory Timestamp.fromXmlElement(XmlElement element) =>

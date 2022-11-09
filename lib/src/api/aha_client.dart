@@ -3,10 +3,14 @@ import 'package:http/http.dart';
 
 import 'aha/aha_service.dart';
 import 'aha/models/device_list.dart';
+import 'aha/models/device_stats.dart';
+import 'aha/models/hkr_temperature.dart';
+import 'aha/models/temperature.dart';
 import 'login/login_manager.dart';
 import 'login/login_service.dart';
 import 'login/models/session_info.dart';
 import 'util/combined_converter.dart';
+import 'util/text_converter.dart';
 import 'util/xml_converter.dart';
 
 class AhaClient {
@@ -30,13 +34,22 @@ class AhaClient {
           ).toString(),
           converter: CombinedConverter([
             XmlConverter()
-              ..registerConverter(
+              ..registerResponseConverter(
                 SessionInfo.elementName,
                 SessionInfo.fromXmlElement,
               )
-              ..registerConverter(
+              ..registerResponseConverter(
                 DeviceList.elementName,
                 DeviceList.fromXmlElement,
+              )
+              ..registerResponseConverter(
+                DeviceStats.elementName,
+                DeviceStats.fromXmlElement,
+              ),
+            TextConverter()
+              ..registerResponseConverter<Temperature>(Temperature.fromString)
+              ..registerResponseConverter<HkrTemperature>(
+                HkrTemperature.fromString,
               ),
           ]),
           interceptors: <dynamic>[

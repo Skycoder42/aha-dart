@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/xml_convertible.dart';
 import 'percentage.dart';
 
 part 'level_control.freezed.dart';

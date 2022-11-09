@@ -2,7 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/text_convertible.dart';
+import '../../util/xml_convertible.dart';
 
 part 'hkr_temperature.freezed.dart';
 part 'hkr_temperature.g.dart';
@@ -19,7 +20,7 @@ class HkrTemperatureValue with _$HkrTemperatureValue {
 @xml.XmlSerializable()
 abstract class HkrTemperature
     with _$HkrTemperature
-    implements IXmlSerializable {
+    implements IXmlSerializable, ITextConvertible {
   static const _offValue = 253;
   static const _onValue = 254;
   static const _invalidValue = 255;
@@ -30,13 +31,16 @@ abstract class HkrTemperature
   @With.fromString(r'_$_$_HkrTemperatureXmlSerializableMixin')
   const factory HkrTemperature({
     @xml.XmlText()
-    @visibleForTesting
+    @visibleForOverriding
     @Default(HkrTemperature._invalidValue)
         int rawValue,
   }) = _HkrTemperature;
 
   factory HkrTemperature.fromXmlElement(XmlElement element) =>
       _$_$_HkrTemperatureFromXmlElement(element);
+
+  factory HkrTemperature.fromString(String rawValue) =>
+      HkrTemperature(rawValue: int.parse(rawValue));
 
   const HkrTemperature._();
 
@@ -54,4 +58,7 @@ abstract class HkrTemperature
 
   @override
   String toString() => value.toString();
+
+  @override
+  String toText() => rawValue.toString();
 }

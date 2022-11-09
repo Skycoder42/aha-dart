@@ -2,25 +2,31 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/text_convertible.dart';
+import '../../util/xml_convertible.dart';
 
 part 'temperature.freezed.dart';
 part 'temperature.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
-abstract class Temperature with _$Temperature implements IXmlSerializable {
+abstract class Temperature
+    with _$Temperature
+    implements IXmlSerializable, ITextConvertible {
   static const invalid = Temperature();
 
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_TemperatureXmlSerializableMixin')
   const factory Temperature({
-    @xml.XmlElement(name: 'celsius') @visibleForTesting int? rawCelsius,
-    @xml.XmlElement(name: 'offset') @visibleForTesting int? rawOffset,
+    @xml.XmlElement(name: 'celsius') @visibleForOverriding int? rawCelsius,
+    @xml.XmlElement(name: 'offset') @visibleForOverriding int? rawOffset,
   }) = _Temperature;
 
   factory Temperature.fromXmlElement(XmlElement element) =>
       _$_$_TemperatureFromXmlElement(element);
+
+  factory Temperature.fromString(String rawCelsius) =>
+      Temperature(rawCelsius: int.parse(rawCelsius));
 
   const Temperature._();
 
@@ -31,5 +37,10 @@ abstract class Temperature with _$Temperature implements IXmlSerializable {
   double get offset => (rawOffset ?? 0) / 10;
 
   @override
-  String toString() => '$temperature°C (Offset: $offset°C)';
+  String toString() => rawOffset != null
+      ? '$temperature°C (Offset: $offset°C)'
+      : '$temperature°C';
+
+  @override
+  String toText() => rawCelsius.toString();
 }

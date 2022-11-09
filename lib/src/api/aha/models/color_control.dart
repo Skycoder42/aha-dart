@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/xml_convertible.dart';
 import 'level_control.dart';
 
 part 'color_control.freezed.dart';
@@ -36,8 +36,8 @@ abstract class ColorControl with _$ColorControl implements IXmlSerializable {
     @xml.XmlAttribute(name: 'current_mode')
     @Default(ColorControlMode.unknown)
         ColorControlMode currentMode,
-    @xml.XmlElement() @visibleForTesting String? hue,
-    @xml.XmlElement() @visibleForTesting String? saturation,
+    @xml.XmlElement() @visibleForOverriding String? hue,
+    @xml.XmlElement() @visibleForOverriding String? saturation,
     @xml.XmlElement(name: 'temperature') int? temperatureKelvin,
   }) = _ColorControl;
 

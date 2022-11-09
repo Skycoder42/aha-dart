@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_serializable.dart';
+import '../../util/xml_convertible.dart';
 import 'device.dart';
 
 part 'device_list.freezed.dart';
@@ -27,7 +27,7 @@ abstract class DeviceList with _$DeviceList implements IXmlConvertible {
     @xml.XmlAttribute(name: 'fwversion') @Default('') String fwVersion,
     @xml.XmlElement(name: Device.deviceElementName) List<Device>? devices,
     @xml.XmlElement(name: Device.groupElementName)
-    @visibleForTesting
+    @visibleForOverriding
         List<Device>? rawGroups,
   }) = _DeviceList;
 
