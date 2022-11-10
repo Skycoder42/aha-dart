@@ -2,10 +2,16 @@ import 'package:chopper/chopper.dart';
 import 'package:http/http.dart';
 
 import 'aha/aha_service.dart';
+import 'aha/models/color_defaults.dart';
+import 'aha/models/device.dart';
 import 'aha/models/device_list.dart';
 import 'aha/models/device_stats.dart';
+import 'aha/models/energy.dart';
 import 'aha/models/hkr_temperature.dart';
+import 'aha/models/power.dart';
+import 'aha/models/subscription_state.dart';
 import 'aha/models/temperature.dart';
+import 'aha/models/timestamp.dart';
 import 'login/login_manager.dart';
 import 'login/login_service.dart';
 import 'login/models/session_info.dart';
@@ -43,14 +49,28 @@ class AhaClient {
                 DeviceList.fromXmlElement,
               )
               ..registerResponseConverter(
+                Device.deviceElementName,
+                Device.fromXmlElement,
+                const [Device.groupElementName],
+              )
+              ..registerResponseConverter(
                 DeviceStats.elementName,
                 DeviceStats.fromXmlElement,
+              )
+              ..registerResponseConverter(
+                ColorDefaults.elementName,
+                ColorDefaults.fromXmlElement,
+              )
+              ..registerResponseConverter(
+                State.elementName,
+                State.fromXmlElement,
               ),
             TextConverter()
-              ..registerResponseConverter<Temperature>(Temperature.fromString)
-              ..registerResponseConverter<HkrTemperature>(
-                HkrTemperature.fromString,
-              ),
+              ..registerResponseConverter(Power.fromString)
+              ..registerResponseConverter(Energy.fromString)
+              ..registerResponseConverter(Temperature.fromString)
+              ..registerResponseConverter(HkrTemperature.fromString)
+              ..registerResponseConverter(Timestamp.fromString),
           ]),
           interceptors: <dynamic>[
             loginManager,

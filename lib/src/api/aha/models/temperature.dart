@@ -2,17 +2,14 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/text_convertible.dart';
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 
 part 'temperature.freezed.dart';
 part 'temperature.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
-abstract class Temperature
-    with _$Temperature
-    implements IXmlSerializable, ITextConvertible {
+abstract class Temperature with _$Temperature implements IXmlSerializable {
   static const invalid = Temperature();
 
   @xml.XmlSerializable(createMixin: true)
@@ -37,10 +34,9 @@ abstract class Temperature
   double get offset => (rawOffset ?? 0) / 10;
 
   @override
-  String toString() => rawOffset != null
-      ? '$temperature°C (Offset: $offset°C)'
-      : '$temperature°C';
-
-  @override
-  String toText() => rawCelsius.toString();
+  String toString({bool pretty = false}) => pretty
+      ? (rawOffset != null
+          ? '$temperature°C (Offset: $offset°C)'
+          : '$temperature°C')
+      : rawCelsius.toString();
 }

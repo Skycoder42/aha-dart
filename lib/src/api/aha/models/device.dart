@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'alert.dart';
 import 'avm_button.dart';
 import 'button.dart';
@@ -21,7 +21,7 @@ part 'device.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
-abstract class Device with _$Device implements IXmlSerializable {
+abstract class Device with _$Device implements IXmlConvertible {
   static const deviceElementName = 'device';
   static const groupElementName = 'group';
 
@@ -29,6 +29,7 @@ abstract class Device with _$Device implements IXmlSerializable {
   static const invalidGroup = DeviceGroup();
 
   @xml.XmlSerializable(createMixin: true)
+  @xml.XmlRootElement(name: Device.deviceElementName)
   @With.fromString(r'_$_$_DeviceXmlSerializableMixin')
   const factory Device({
     @xml.XmlAttribute() @Default(0) int id,
@@ -58,6 +59,7 @@ abstract class Device with _$Device implements IXmlSerializable {
   }) = _Device;
 
   @xml.XmlSerializable(createMixin: true)
+  @xml.XmlRootElement(name: Device.groupElementName)
   @With.fromString(r'_$_$DeviceGroupXmlSerializableMixin')
   const factory Device.group({
     @xml.XmlAttribute() @Default(0) int id,

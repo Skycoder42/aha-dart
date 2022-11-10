@@ -1,11 +1,21 @@
 import 'package:chopper/chopper.dart';
+import 'package:color/color.dart';
 
+import 'models/blind_state.dart';
+import 'models/color_defaults.dart';
+import 'models/device.dart';
 import 'models/device_list.dart';
 import 'models/device_stats.dart';
+import 'models/energy.dart';
 import 'models/hkr_temperature.dart';
+import 'models/level.dart';
 import 'models/percentage.dart';
+import 'models/power.dart';
+import 'models/subscription_state.dart';
 import 'models/switch_action.dart';
+import 'models/switch_duration.dart';
 import 'models/temperature.dart';
+import 'models/timestamp.dart';
 
 part 'aha_service.chopper.dart';
 
@@ -15,13 +25,19 @@ abstract class AhaService extends ChopperService {
 
   static AhaService create([ChopperClient? client]) => _$AhaService(client);
 
-  // all devices
+  // all devices / global
 
   @Get(path: '$_baseUrl=getdevicelistinfos')
   Future<Response<DeviceList>> getDeviceListInfos();
 
+  @Get(path: '$_baseUrl=getdeviceinfos')
+  Future<Response<Device>> getDeviceInfos(@Query() String ain);
+
   @Get(path: '$_baseUrl=getbasicdevicestats')
   Future<Response<DeviceStats>> getBasicDeviceStats(@Query() String ain);
+
+  @Get(path: '$_baseUrl=setname')
+  Future<Response<void>> setName(@Query() String ain, @Query() String name);
 
   // switches
 
@@ -43,13 +59,12 @@ abstract class AhaService extends ChopperService {
   @Get(path: '$_baseUrl=getswitchpresent')
   Future<Response<bool>> getSwitchPresent(@Query() String ain);
 
-  /// Returns the power in mW
   @Get(path: '$_baseUrl=getswitchpower')
-  Future<Response<int?>> getSwitchPower(@Query() String ain);
+  Future<Response<Power?>> getSwitchPower(@Query() String ain);
 
   /// Returns the energy in Wh
   @Get(path: '$_baseUrl=getswitchenergy')
-  Future<Response<int?>> getSwitchEnergy(@Query() String ain);
+  Future<Response<Energy?>> getSwitchEnergy(@Query() String ain);
 
   @Get(path: '$_baseUrl=getswitchname')
   Future<Response<String>> getSwitchName(@Query() String ain);
@@ -73,8 +88,20 @@ abstract class AhaService extends ChopperService {
   @Get(path: '$_baseUrl=sethkrtsoll')
   Future<Response<void>> setHkrTSoll(
     @Query() String ain,
-    @Query('param') HkrTemperature temperature,
+    @Query() HkrTemperature param,
   );
+
+  @Get(path: '$_baseUrl=sethkrboost')
+  Future<Response<Timestamp>> setHkrBoost(
+    @Query() String ain, [
+    @Query('endtimestamp') Timestamp endTimestamp = Timestamp.deactivated,
+  ]);
+
+  @Get(path: '$_baseUrl=sethkrwindowopen')
+  Future<Response<Timestamp>> setHkrWindowOpen(
+    @Query() String ain, [
+    @Query('endtimestamp') Timestamp endTimestamp = Timestamp.deactivated,
+  ]);
 
   // templates
 
@@ -92,13 +119,71 @@ abstract class AhaService extends ChopperService {
     @Query('onoff') SwitchAction onOff,
   );
 
-  /// Level must be [0, 255]
+  // level controllable
+
   @Get(path: '$_baseUrl=setlevel')
-  Future<Response<void>> setLevel(@Query() String ain, @Query() int level);
+  Future<Response<void>> setLevel(@Query() String ain, @Query() Level level);
 
   @Get(path: '$_baseUrl=setlevelpercentage')
   Future<Response<void>> setLevelPercentage(
     @Query() String ain,
     @Query() Percentage level,
   );
+
+  // light bulbs
+
+  @Get(path: '$_baseUrl=setcolor')
+  Future<Response<void>> _setColor(
+    @Query() String ain, {
+    @Query() required int hue,
+    @Query() required int saturation,
+    @Query() required SwitchDuration duration,
+  });
+
+  Future<Response<void>> setColorHs(
+    String ain,
+    HsvColor color,
+    SwitchDuration duration,
+  ) =>
+      _setColor(
+        ain,
+        hue: color.h.round(),
+        saturation: color.s.round(),
+        duration: duration,
+      );
+
+  Future<Response<void>> setColorV(
+    String ain,
+    HsvColor color,
+  ) =>
+      setLevel(
+        ain,
+        Percentage(rawValue: color.v.round()).toLevel(),
+      );
+
+  @Get(path: '$_baseUrl=setcolortemperature')
+  Future<Response<void>> setColorTemperature(
+    @Query() String ain,
+    @Query() int temperature,
+    @Query() SwitchDuration duration,
+  );
+
+  @Get(path: '$_baseUrl=getcolordefaults')
+  Future<Response<ColorDefaults>> getColorDefaults();
+
+  // blinds
+
+  @Get(path: '$_baseUrl=setblind')
+  Future<Response<void>> setBlind(
+    @Query() String ain,
+    @Query() BlindState target,
+  );
+
+  // device registration
+
+  @Get(path: '$_baseUrl=startulesubscription')
+  Future<Response<void>> startUleSubscription();
+
+  @Get(path: '$_baseUrl=getsubscriptionstate')
+  Future<Response<State>> getSubscriptionState();
 }

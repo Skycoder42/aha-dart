@@ -2,25 +2,34 @@ import 'package:chopper/chopper.dart';
 import 'package:xml/xml.dart';
 
 import 'combined_converter.dart';
-import 'xml_convertible.dart';
+import 'xml_serializable.dart';
 
 typedef FromXmlFactory<T> = T Function(XmlElement);
 
 class _XmlConverter<T> {
   final String rootElementName;
   final FromXmlFactory<T> fromXmlElement;
+  final List<String>? additionalElementNames;
 
-  const _XmlConverter(this.rootElementName, this.fromXmlElement);
+  const _XmlConverter(
+    this.rootElementName,
+    this.fromXmlElement,
+    this.additionalElementNames,
+  );
+
+  List<String> get allowedElementNames =>
+      [rootElementName, ...?additionalElementNames];
 }
 
 class InvalidRootElement implements Exception {
-  final String exceptedElement;
+  final List<String> exceptedElements;
   final XmlName actualElement;
 
-  InvalidRootElement(this.exceptedElement, this.actualElement);
+  InvalidRootElement(this.exceptedElements, this.actualElement);
 
   @override
-  String toString() => 'Invalid root element: Expected <$exceptedElement>, '
+  String toString() => 'Invalid root element: '
+      'Expected ${exceptedElements.map((e) => '<$e>').join(' or ')}, '
       'but was $actualElement';
 }
 
@@ -31,9 +40,14 @@ class XmlConverter extends CombinableConverter {
 
   void registerResponseConverter<T extends IXmlConvertible>(
     String element,
-    FromXmlFactory<T> fromXmlElement,
-  ) =>
-      _xmlFactories[T] = _XmlConverter(element, fromXmlElement);
+    FromXmlFactory<T> fromXmlElement, [
+    List<String>? additionalElementNames,
+  ]) =>
+      _xmlFactories[T] = _XmlConverter(
+        element,
+        fromXmlElement,
+        additionalElementNames,
+      );
 
   @override
   List<String> get supportedContentTypes =>
@@ -84,8 +98,8 @@ class XmlConverter extends CombinableConverter {
       throw ConversionNotSupported(T, 'response');
     }
 
-    if (rootElementName.local != factory.rootElementName) {
-      throw InvalidRootElement(factory.rootElementName, rootElementName);
+    if (!factory.allowedElementNames.contains(rootElementName.local)) {
+      throw InvalidRootElement(factory.allowedElementNames, rootElementName);
     }
 
     return factory.fromXmlElement;

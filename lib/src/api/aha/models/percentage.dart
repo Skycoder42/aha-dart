@@ -2,17 +2,15 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/text_convertible.dart';
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
+import 'level.dart';
 
 part 'percentage.freezed.dart';
 part 'percentage.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
-abstract class Percentage
-    with _$Percentage
-    implements IXmlSerializable, ITextConvertible {
+abstract class Percentage with _$Percentage implements IXmlSerializable {
   static const _invalidPercentageValue = -9999;
 
   static const invalid = Percentage();
@@ -40,10 +38,10 @@ abstract class Percentage
 
   double get value => rawValue != _invalidPercentageValue ? rawValue / 100 : 0;
 
-  @override
-  String toString() =>
-      rawValue != _invalidPercentageValue ? '$rawValue%' : 'invalid';
+  Level toLevel() => Level(level: rawValue * 255 ~/ 100);
 
   @override
-  String toText() => rawValue.toString();
+  String toString({bool pretty = false}) => pretty
+      ? (rawValue != _invalidPercentageValue ? '$rawValue%' : 'invalid')
+      : rawValue.toString();
 }

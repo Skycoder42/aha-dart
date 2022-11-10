@@ -1,3 +1,4 @@
 # Generated files
 !*.chopper.dart
 !*.freezed.dart
+!*.g.dart

@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'hkr_temperature.dart';
 import 'next_change.dart';
 import 'percentage.dart';
@@ -57,11 +57,11 @@ abstract class Hkr with _$Hkr implements IXmlSerializable {
     @Default(false)
         bool windowOpenActive,
     @xml.XmlElement(name: 'windowopenactiveendtime')
-    @Default(Timestamp.invalid)
+    @Default(Timestamp.deactivated)
         Timestamp windowOpenActiveEndTime,
     @xml.XmlElement(name: 'boostactive') @Default(false) bool boostActive,
     @xml.XmlElement(name: 'boostactiveendtime')
-    @Default(Timestamp.invalid)
+    @Default(Timestamp.deactivated)
         Timestamp boostActiveEndTime,
     @xml.XmlElement(name: 'batterylow') @Default(false) bool batteryLow,
     @xml.XmlElement() @Default(Percentage.invalid) Percentage battery,

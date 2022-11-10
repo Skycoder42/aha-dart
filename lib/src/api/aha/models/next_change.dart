@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'hkr_temperature.dart';
 import 'timestamp.dart';
 
@@ -18,7 +18,7 @@ abstract class NextChange with _$NextChange implements IXmlSerializable {
   @With.fromString(r'_$_$_NextChangeXmlSerializableMixin')
   const factory NextChange({
     @xml.XmlElement(name: 'endperiod')
-    @Default(Timestamp.invalid)
+    @Default(Timestamp.deactivated)
         Timestamp endPeriod,
     @xml.XmlElement(name: 'tchange')
     @Default(HkrTemperature.invalid)

@@ -2,7 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
+import 'level.dart';
 import 'percentage.dart';
 
 part 'level_control.freezed.dart';
@@ -15,12 +16,8 @@ abstract class LevelControl with _$LevelControl implements IXmlSerializable {
 
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_LevelControlXmlSerializableMixin')
-  @Assert(
-    'level >= 0 && level <= 255',
-    'level must be in range [0, 255]',
-  )
   const factory LevelControl({
-    @xml.XmlElement() @Default(0) int level,
+    @xml.XmlElement() @Default(Level.invalid) Level level,
     @xml.XmlElement(name: 'levelpercentage')
     @Default(Percentage.invalid)
         Percentage levelPercentage,

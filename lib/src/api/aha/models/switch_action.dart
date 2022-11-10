@@ -1,6 +1,4 @@
-import '../../util/text_convertible.dart';
-
-enum SwitchAction implements ITextConvertible {
+enum SwitchAction {
   off(0),
   on(1),
   toggle(2);
@@ -10,5 +8,6 @@ enum SwitchAction implements ITextConvertible {
   const SwitchAction(this.value);
 
   @override
-  String toText() => value.toString();
+  String toString({bool pretty = false}) =>
+      pretty ? super.toString() : value.toString();
 }

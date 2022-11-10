@@ -1,7 +1,6 @@
 import 'package:chopper/chopper.dart';
 
 import 'combined_converter.dart';
-import 'text_convertible.dart';
 
 typedef FromTextFactory<T> = T Function(String);
 
@@ -49,9 +48,7 @@ class TextConverter extends CombinableConverter {
       );
 
   String _encode(dynamic data) {
-    if (data is ITextConvertible) {
-      return data.toText();
-    } else if (data is Iterable) {
+    if (data is Iterable) {
       return data.map(_encode).join(',');
     } else if (data == null) {
       return _invalidValue;

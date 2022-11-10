@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:xml/xml.dart';
 import 'package:xml_annotation/xml_annotation.dart' as xml;
 
-import '../../util/xml_convertible.dart';
+import '../../util/xml_serializable.dart';
 import 'timestamp.dart';
 
 part 'alert.freezed.dart';
@@ -37,7 +37,7 @@ abstract class Alert with _$Alert implements IXmlSerializable {
   const factory Alert({
     @xml.XmlElement() @Default(AlertState.unknown) AlertState state,
     @xml.XmlElement(name: 'lastalertchgtimestamp')
-    @Default(Timestamp.invalid)
+    @Default(Timestamp.deactivated)
         Timestamp lastAlertChgTimestamp,
   }) = _Alert;
 
