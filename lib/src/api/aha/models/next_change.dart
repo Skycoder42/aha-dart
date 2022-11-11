@@ -9,11 +9,18 @@ import 'timestamp.dart';
 part 'next_change.freezed.dart';
 part 'next_change.g.dart';
 
+/// A scheduled change of temperature of a thermostat.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class NextChange with _$NextChange implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = NextChange();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_NextChangeXmlSerializableMixin')
   const factory NextChange({
@@ -25,6 +32,8 @@ abstract class NextChange with _$NextChange implements IXmlSerializable {
         HkrTemperature tChange,
   }) = _NextChange;
 
+  /// @nodoc
+  @internal
   factory NextChange.fromXmlElement(XmlElement element) =>
       _$_$_NextChangeFromXmlElement(element);
 }

@@ -7,11 +7,18 @@ import '../../util/xml_serializable.dart';
 part 'name.freezed.dart';
 part 'name.g.dart';
 
+/// The name of a specific color group.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Name with _$Name implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = Name();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_NameXmlSerializableMixin')
   const factory Name({
@@ -19,6 +26,8 @@ abstract class Name with _$Name implements IXmlSerializable {
     @xml.XmlText() @Default('') String name,
   }) = _Name;
 
+  /// @nodoc
+  @internal
   factory Name.fromXmlElement(XmlElement element) =>
       _$_$_NameFromXmlElement(element);
 }

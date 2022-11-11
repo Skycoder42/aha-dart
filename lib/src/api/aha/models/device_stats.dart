@@ -10,13 +10,22 @@ import 'stats_group.dart';
 part 'device_stats.freezed.dart';
 part 'device_stats.g.dart';
 
+/// A collection of measurement statistics for a given device.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class DeviceStats with _$DeviceStats implements IXmlConvertible {
+  /// @nodoc
+  @internal
   static const elementName = 'devicestats';
 
+  /// @nodoc
+  @internal
   static const invalid = DeviceStats();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @xml.XmlRootElement(name: DeviceStats.elementName)
   @With.fromString(r'_$_$_DeviceStatsXmlSerializableMixin')
@@ -28,6 +37,8 @@ abstract class DeviceStats with _$DeviceStats implements IXmlConvertible {
     @xml.XmlElement() StatsGroup<StatsUnitWattHours>? energy,
   }) = _DeviceStats;
 
+  /// @nodoc
+  @internal
   factory DeviceStats.fromXmlElement(XmlElement element) =>
       _$_$_DeviceStatsFromXmlElement(element);
 }

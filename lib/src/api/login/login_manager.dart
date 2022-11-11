@@ -14,6 +14,16 @@ import 'models/session_info.dart';
 import 'models/sid.dart';
 import 'user_credentials.dart';
 
+/// A abstract base class for authenticating with a fritz.box.
+///
+/// This handles all the complex logic around the login, only requiring you to
+/// implement the [obtainCredentials] method to get the credentials from the
+/// user.
+///
+/// **Important:** Only version 2 of the login protocol is supported, which is
+/// available since FRITZ!OS 5.50. Older models are not supported.
+///
+/// {@macro aha_reference}
 // ignore: must_be_immutable
 abstract class LoginManager implements RequestInterceptor, Authenticator {
   static const _pbkdf2Bits = 256;
@@ -25,34 +35,80 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
   late final LoginService _loginService;
 
+  /// The id of the currently active session.
+  ///
+  /// If not logged in yet, the id will be invalid. To check if a session has
+  /// expired, use the [checkSessionValid] method.
   Sid sid = Sid.invalid;
 
+  /// The access rights of the currently active session.
+  ///
+  /// If no session is active, the rights will be empty
   AccessRights get rights => _rights;
 
+  /// Perform an explicit login at the remote friz.box.
+  ///
+  /// If a session is already active and still valid, the login will be skipped.
+  /// Otherwise a login is started.
+  ///
+  /// See [obtainCredentials] for how to provide credentials. If a login is
+  // ignore: comment_references
+  /// started as result of this method, the [LoginInfo.reason] will always be
+  /// [LoginReason.manual].
   Future<void> login() async {
     final sessionInfo = await _getLoginStatus();
-    if (!sessionInfo.sid.isValid) {
+    if (!sessionInfo.isValid) {
       final loginInfo = await _performLogin(sessionInfo, LoginReason.manual);
-      if (!loginInfo.sid.isValid) {
+      if (!loginInfo.isValid) {
         throw AuthenticationException.invalidCredentials();
       }
     }
   }
 
+  /// Ends the current session by logging out from the remote fritz.box.
+  ///
+  /// If no session is active, nothing is done. Otherwise, the logout is
+  /// done and the sessions becomes invalid.
   Future<void> logout() async {
     if (!sid.isValid) {
       return;
     }
 
     final sessionInfo = _extractSessionInfo(
-      await _loginService.logout(sid.sid),
+      await _loginService.logout(sid),
     );
 
-    if (sessionInfo.sid.isValid) {
+    if (sessionInfo.isValid) {
       throw AuthenticationException.logoutFailed();
     }
   }
 
+  /// Checks if the currently active session is still active.
+  ///
+  /// This checks with the remote if the current session has not expired yet.
+  ///
+  /// Does nothing if the session is not active.
+  Future<bool> checkSessionValid() async {
+    if (!sid.isValid) {
+      return false;
+    }
+
+    final sessionInfo = _extractSessionInfo(
+      await _loginService.checkSessionValid(sid),
+    );
+
+    return sessionInfo.isValid;
+  }
+
+  /// The method called by [login] and for automatic logins to obtain
+  /// credentials from a user.
+  ///
+  /// Your implementation should ask the user for their username and password
+  /// and return them as the [UserCredentials] object. If the user wants to
+  /// cancel the login, return `null` instead.
+  ///
+  /// You can use the provided [loginInfo] to present the user information
+  /// about the login.
   @protected
   FutureOr<UserCredentials?> obtainCredentials(LoginInfo loginInfo);
 
@@ -85,6 +141,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     return _copyRequestWithSid(request);
   }
 
+  /// @nodoc
   @internal
   // ignore: use_setters_to_change_properties
   void setup(LoginService loginService) {
@@ -100,7 +157,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
   Future<void> _autoLogin(bool isRefresh) async {
     var sessionInfo = await _getLoginStatus();
-    while (!sessionInfo.sid.isValid) {
+    while (!sessionInfo.isValid) {
       sessionInfo = await _performLogin(
         sessionInfo,
         isRefresh ? LoginReason.refresh : LoginReason.auto,
@@ -110,7 +167,7 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
 
   Future<SessionInfo> _getLoginStatus() async => _extractSessionInfo(
         sid.isValid
-            ? await _loginService.checkSessionValid(sid.sid)
+            ? await _loginService.checkSessionValid(sid)
             : await _loginService.getLoginStatus(),
       );
 
@@ -118,16 +175,14 @@ abstract class LoginManager implements RequestInterceptor, Authenticator {
     SessionInfo sessionInfo,
     LoginReason reason,
   ) async {
-    final blockDelay = sessionInfo.blockTime > 0
-        ? Duration(seconds: sessionInfo.blockTime)
+    final blockTimeout = sessionInfo.blockTime > Duration.zero
+        ? Future<void>.delayed(sessionInfo.blockTime)
         : null;
-    final blockTimeout =
-        blockDelay != null ? Future<void>.delayed(blockDelay) : null;
 
     final credentials = await obtainCredentials(
       LoginInfo(
         knownUsers: sessionInfo.users.users ?? const [],
-        blockTime: blockDelay,
+        blockTime: sessionInfo.blockTime,
         reason: reason,
       ),
     );

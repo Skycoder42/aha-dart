@@ -28,7 +28,6 @@ dev_dependencies:
   xml_serializable: ^2.2.2
 
 dart_pre_commit:
-  lib-exports: false
   pull-up-dependencies:
     allowed:
       - xml # flutter

@@ -1,5 +1,8 @@
+// ignore_for_file: public_member_api_docs
+
 import 'package:chopper/chopper.dart';
 import 'package:color/color.dart';
+import 'package:meta/meta.dart';
 
 import 'models/blind_state.dart';
 import 'models/color_defaults.dart';
@@ -23,6 +26,8 @@ part 'aha_service.chopper.dart';
 abstract class AhaService extends ChopperService {
   static const _baseUrl = '/webservices/homeautoswitch.lua?switchcmd';
 
+  /// @nodoc
+  @internal
   static AhaService create([ChopperClient? client]) => _$AhaService(client);
 
   // all devices / global
@@ -158,6 +163,7 @@ abstract class AhaService extends ChopperService {
   ) =>
       setLevel(
         ain,
+        // ignore: invalid_use_of_visible_for_overriding_member
         Percentage(rawValue: color.v.round()).toLevel(),
       );
 

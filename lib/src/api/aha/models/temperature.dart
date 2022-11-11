@@ -7,11 +7,18 @@ import '../../util/xml_serializable.dart';
 part 'temperature.freezed.dart';
 part 'temperature.g.dart';
 
+/// The temperature of a temperature measurement device.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Temperature with _$Temperature implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = Temperature();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_TemperatureXmlSerializableMixin')
   const factory Temperature({
@@ -19,18 +26,22 @@ abstract class Temperature with _$Temperature implements IXmlSerializable {
     @xml.XmlElement(name: 'offset') @visibleForOverriding int? rawOffset,
   }) = _Temperature;
 
+  /// @nodoc
+  @internal
   factory Temperature.fromXmlElement(XmlElement element) =>
       _$_$_TemperatureFromXmlElement(element);
 
+  /// @nodoc
+  @internal
   factory Temperature.fromString(String rawCelsius) =>
       Temperature(rawCelsius: int.parse(rawCelsius));
 
   const Temperature._();
 
-  /// The temperature in celsius
+  // ignore: public_member_api_docs
   double get temperature => (rawCelsius ?? 0) / 10;
 
-  /// The temperature offset in celsius
+  // ignore: public_member_api_docs
   double get offset => (rawOffset ?? 0) / 10;
 
   @override

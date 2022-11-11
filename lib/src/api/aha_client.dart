@@ -19,13 +19,37 @@ import 'util/combined_converter.dart';
 import 'util/text_converter.dart';
 import 'util/xml_converter.dart';
 
+/// The AHA Api client.
+///
+/// This client handles both authentication and the actual API access. Please
+/// refer to the official documentation on how the API works.
+///
+/// {@template aha_reference}
+/// See https://avm.de/service/schnittstellen/
+/// {@endtemplate}
 class AhaClient {
+  /// The default host name of a fritz.box.
   static const defaultHostName = 'fritz.box';
 
+  /// The underlying chopper client being used for the API requests.
   final ChopperClient client;
 
+  /// The login manager that can be used to handle sessions.
+  ///
+  /// Provides methods to log in and out of the remote and to check for session
+  /// validity.
   final LoginManager loginManager;
 
+  /// Default constructor.
+  ///
+  /// By default, the client connects to http://fritz.box:80. Can be configured
+  /// via [hostName] and [port].
+  ///
+  /// The [loginManager] parameter is required and should be your extension of
+  /// the [LoginManager] to handle user authentication.
+  ///
+  /// Finally, a custom [httpClient] can be provided to be passed to chopper. If
+  /// given, you are responsible for disposing that client.
   AhaClient({
     String hostName = defaultHostName,
     int? port,
@@ -84,6 +108,9 @@ class AhaClient {
     loginManager.setup(client.getService<LoginService>());
   }
 
+  /// Dispose of the client.
+  ///
+  /// By default, this will automatically logout the user.
   Future<void> dispose({bool withLogout = true}) async {
     if (withLogout) {
       await loginManager.logout();
@@ -92,5 +119,6 @@ class AhaClient {
     client.dispose();
   }
 
+  /// The AHA API client to access the actual API.
   late final AhaService aha = client.getService();
 }

@@ -7,19 +7,28 @@ import '../../util/xml_serializable.dart';
 part 'stats.freezed.dart';
 part 'stats.g.dart';
 
+/// @nodoc
 @internal
 abstract class StatsUnit {}
 
+/// Indicates that the measurements are celsius values.
 abstract class StatsUnitCelsius implements StatsUnit {}
 
+/// Indicates that the measurements are Volt values.
 abstract class StatsUnitVolt implements StatsUnit {}
 
+/// Indicates that the measurements are Watt values.
 abstract class StatsUnitWatt implements StatsUnit {}
 
+/// Indicates that the measurements are Watt hour values.
 abstract class StatsUnitWattHours implements StatsUnit {}
 
+/// Indicates that the measurements are percentage values.
 abstract class StatsUnitPercent implements StatsUnit {}
 
+/// A statistics for a measurement.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Stats<TUnit extends StatsUnit>
@@ -28,33 +37,48 @@ abstract class Stats<TUnit extends StatsUnit>
   static const _separatorValue = ',';
   static const _invalidValue = '-';
 
+  /// @nodoc
+  @internal
   static const invalid = Stats();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_StatsXmlSerializableMixin')
   const factory Stats({
     @xml.XmlAttribute() @Default(0) int count,
+
+    /// @nodoc
     @xml.XmlAttribute(name: 'grid')
     @visibleForOverriding
     @Default(0)
         int rawGrid,
+
+    /// @nodoc
     @xml.XmlText() @visibleForOverriding @Default('') String rawValues,
   }) = _Stats<TUnit>;
 
+  /// @nodoc
+  @internal
   factory Stats.fromXmlElement(XmlElement element) =>
       _$_$_StatsFromXmlElement(element).cast();
 
   const Stats._();
 
+  // ignore: public_member_api_docs
   Duration get grid => Duration(seconds: rawGrid);
 
+  // ignore: public_member_api_docs
   List<double> get values =>
       rawValues.split(_separatorValue).map(_parseElement).toList();
 
+  /// Returns the value at the given [index].
   double operator [](int index) => _parseElement<TUnit>(
         rawValues.split(_separatorValue).elementAt(index),
       );
 
+  /// @nodoc
+  @internal
   Stats<TOtherUnit> cast<TOtherUnit extends StatsUnit>() => Stats<TOtherUnit>(
         count: count,
         rawGrid: rawGrid,

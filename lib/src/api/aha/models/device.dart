@@ -19,15 +19,30 @@ import 'temperature.dart';
 part 'device.freezed.dart';
 part 'device.g.dart';
 
+/// A device with all it's data points.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Device with _$Device implements IXmlConvertible {
+  /// @nodoc
+  @internal
   static const deviceElementName = 'device';
+
+  /// @nodoc
+  @internal
   static const groupElementName = 'group';
 
+  /// @nodoc
+  @internal
   static const invalidDevice = Device();
+
+  /// @nodoc
+  @internal
   static const invalidGroup = DeviceGroup();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @xml.XmlRootElement(name: Device.deviceElementName)
   @With.fromString(r'_$_$_DeviceXmlSerializableMixin')
@@ -58,6 +73,8 @@ abstract class Device with _$Device implements IXmlConvertible {
     @xml.XmlElement(name: 'hkr') Hkr? hkr,
   }) = _Device;
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @xml.XmlRootElement(name: Device.groupElementName)
   @With.fromString(r'_$_$DeviceGroupXmlSerializableMixin')
@@ -93,6 +110,8 @@ abstract class Device with _$Device implements IXmlConvertible {
         GroupInfo groupInfo,
   }) = DeviceGroup;
 
+  /// @nodoc
+  @internal
   factory Device.fromXmlElement(XmlElement element) {
     switch (element.localName) {
       case deviceElementName:

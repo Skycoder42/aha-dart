@@ -3,22 +3,27 @@ import 'dart:async';
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 
-T identity<T>(T t) => t;
-
+/// @nodoc
+@internal
 class ConversionNotSupported extends UnsupportedError {
+  /// @nodoc
   final Type type;
 
+  /// @nodoc
   ConversionNotSupported(this.type, String mode)
       : super('Cannot convert $mode of type $type: No converter registered!');
 }
 
-@immutable
+/// @nodoc
 @internal
 abstract class CombinableConverter implements Converter {
+  /// @nodoc
   const CombinableConverter();
 
+  /// @nodoc
   List<String> get supportedContentTypes;
 
+  /// @nodoc
   FutureOr<Request?> maybeConvertRequest(Request request);
 
   @override
@@ -34,13 +39,16 @@ abstract class CombinableConverter implements Converter {
   }
 }
 
+/// @nodoc
 @internal
 class CombinedConverter implements Converter {
   final List<CombinableConverter> _subConverters;
 
+  /// @nodoc
   CombinedConverter([List<CombinableConverter>? converters])
       : _subConverters = converters ?? [];
 
+  /// @nodoc
   void addConverter(CombinableConverter converter) {
     _subConverters.add(converter);
   }

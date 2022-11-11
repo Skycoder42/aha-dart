@@ -12,29 +12,44 @@ import 'timestamp.dart';
 part 'hkr.freezed.dart';
 part 'hkr.g.dart';
 
+/// Possible error states of a thermostat
 @xml.XmlEnum()
 enum HkrError {
   @xml.XmlValue('0')
+  // ignore: public_member_api_docs
   noError,
   @xml.XmlValue('1')
+  // ignore: public_member_api_docs
   incorrectInstallation,
   @xml.XmlValue('2')
+  // ignore: public_member_api_docs
   incompatibleValveOrLowBattery,
   @xml.XmlValue('3')
+  // ignore: public_member_api_docs
   valveBlocked,
   @xml.XmlValue('4')
+  // ignore: public_member_api_docs
   preparingInstallation,
   @xml.XmlValue('5')
+  // ignore: public_member_api_docs
   installationReady,
   @xml.XmlValue('6')
+  // ignore: public_member_api_docs
   installationInProgress,
 }
 
+/// The configuration of a thermostat.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Hkr with _$Hkr implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = Hkr();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_HkrXmlSerializableMixin')
   const factory Hkr({
@@ -72,6 +87,8 @@ abstract class Hkr with _$Hkr implements IXmlSerializable {
     @xml.XmlElement(name: 'holidayactive') @Default(false) bool holidayActive,
   }) = _Hkr;
 
+  /// @nodoc
+  @internal
   factory Hkr.fromXmlElement(XmlElement element) =>
       _$_$_HkrFromXmlElement(element);
 }

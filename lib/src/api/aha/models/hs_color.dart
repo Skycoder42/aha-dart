@@ -9,11 +9,18 @@ import 'name.dart';
 part 'hs_color.freezed.dart';
 part 'hs_color.g.dart';
 
+/// A predefined HSV color.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class HsColor with _$HsColor implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = HsColor();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_HsColorXmlSerializableMixin')
   const factory HsColor({
@@ -24,6 +31,8 @@ abstract class HsColor with _$HsColor implements IXmlSerializable {
         List<Color> colors,
   }) = _HsColor;
 
+  /// @nodoc
+  @internal
   factory HsColor.fromXmlElement(XmlElement element) =>
       _$_$_HsColorFromXmlElement(element);
 }

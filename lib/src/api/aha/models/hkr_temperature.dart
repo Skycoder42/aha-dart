@@ -7,14 +7,28 @@ import '../../util/xml_serializable.dart';
 part 'hkr_temperature.freezed.dart';
 part 'hkr_temperature.g.dart';
 
+/// The state of a thermostat.
 @freezed
-class HkrTemperatureValue with _$HkrTemperatureValue {
-  const factory HkrTemperatureValue(double celsiusValue) = _Value;
-  const factory HkrTemperatureValue.on() = _On;
-  const factory HkrTemperatureValue.off() = _Off;
-  const factory HkrTemperatureValue.invalid() = _Invalid;
+class HkrState with _$HkrState {
+  /// Device is turned on for the given temperature.
+  const factory HkrState(
+    /// The configured temperature in celsius.
+    double celsiusValue,
+  ) = _Value;
+
+  /// Device is fully turned on.
+  const factory HkrState.on() = _On;
+
+  /// Device is turned off.
+  const factory HkrState.off() = _Off;
+
+  /// Device state is not known.
+  const factory HkrState.invalid() = _Invalid;
 }
 
+/// The temperature configuration state of a thermostat.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class HkrTemperature
@@ -24,8 +38,12 @@ abstract class HkrTemperature
   static const _onValue = 254;
   static const _invalidValue = 255;
 
+  /// @nodoc
+  @internal
   static const invalid = HkrTemperature();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_HkrTemperatureXmlSerializableMixin')
   const factory HkrTemperature({
@@ -35,27 +53,40 @@ abstract class HkrTemperature
         int rawValue,
   }) = _HkrTemperature;
 
+  /// @nodoc
+  @internal
   factory HkrTemperature.fromXmlElement(XmlElement element) =>
       _$_$_HkrTemperatureFromXmlElement(element);
 
+  /// @nodoc
+  @internal
   factory HkrTemperature.fromString(String rawValue) =>
       HkrTemperature(rawValue: int.parse(rawValue));
 
+  /// Create a new HkrTemperature object from the given [value].
+  factory HkrTemperature.create(HkrState value) => value.when(
+        (celsiusValue) => HkrTemperature(rawValue: (celsiusValue * 2).toInt()),
+        on: () => const HkrTemperature(rawValue: _onValue),
+        off: () => const HkrTemperature(rawValue: _offValue),
+        invalid: () => HkrTemperature.invalid,
+      );
+
   const HkrTemperature._();
 
-  HkrTemperatureValue get value {
+  /// The current state of the thermostat
+  HkrState get state {
     if (rawValue == _onValue) {
-      return const HkrTemperatureValue.on();
+      return const HkrState.on();
     } else if (rawValue == _offValue) {
-      return const HkrTemperatureValue.off();
+      return const HkrState.off();
     } else if (rawValue == _invalidValue) {
-      return const HkrTemperatureValue.invalid();
+      return const HkrState.invalid();
     } else {
-      return HkrTemperatureValue(rawValue / 2);
+      return HkrState(rawValue / 2);
     }
   }
 
   @override
   String toString({bool pretty = false}) =>
-      pretty ? value.toString() : rawValue.toString();
+      pretty ? state.toString() : rawValue.toString();
 }

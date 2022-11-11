@@ -1,9 +1,33 @@
 import 'package:chopper/chopper.dart';
+import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
 import 'combined_converter.dart';
 import 'xml_serializable.dart';
 
+/// An error that indicates that the XML document cannot be deserialized because
+/// the root element of the document is not as expected.
+class InvalidRootElement implements Exception {
+  /// The type that the XML could not be deserialized to.
+  final Type type;
+
+  /// A list of elements that are supported for the given [type].
+  final List<String> exceptedElements;
+
+  /// The actual XML name of the root element of the document.
+  final XmlName actualElement;
+
+  /// Default constructor.
+  InvalidRootElement(this.type, this.exceptedElements, this.actualElement);
+
+  @override
+  String toString() => 'Invalid root element for type $type: '
+      'Expected ${exceptedElements.map((e) => '<$e>').join(' or ')}, '
+      'but was $actualElement';
+}
+
+/// @nodoc
+@internal
 typedef FromXmlFactory<T> = T Function(XmlElement);
 
 class _XmlConverter<T> {
@@ -21,23 +45,14 @@ class _XmlConverter<T> {
       [rootElementName, ...?additionalElementNames];
 }
 
-class InvalidRootElement implements Exception {
-  final List<String> exceptedElements;
-  final XmlName actualElement;
-
-  InvalidRootElement(this.exceptedElements, this.actualElement);
-
-  @override
-  String toString() => 'Invalid root element: '
-      'Expected ${exceptedElements.map((e) => '<$e>').join(' or ')}, '
-      'but was $actualElement';
-}
-
+/// @nodoc
+@internal
 class XmlConverter extends CombinableConverter {
   static const _xmlContentType = 'text/xml';
 
   final _xmlFactories = <Type, _XmlConverter<Object>>{};
 
+  /// @nodoc
   void registerResponseConverter<T extends IXmlConvertible>(
     String element,
     FromXmlFactory<T> fromXmlElement, [
@@ -99,7 +114,7 @@ class XmlConverter extends CombinableConverter {
     }
 
     if (!factory.allowedElementNames.contains(rootElementName.local)) {
-      throw InvalidRootElement(factory.allowedElementNames, rootElementName);
+      throw InvalidRootElement(T, factory.allowedElementNames, rootElementName);
     }
 
     return factory.fromXmlElement;

@@ -8,17 +8,27 @@ import 'switch_state.dart';
 part 'switch.freezed.dart';
 part 'switch.g.dart';
 
+/// The mode of the switch.
 @xml.XmlEnum()
 enum SwitchMode {
+  // ignore: public_member_api_docs
   manuell,
+  // ignore: public_member_api_docs
   auto,
 }
 
+/// The configuration of a switch device.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Switch with _$Switch implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = Switch();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_SwitchXmlSerializableMixin')
   const factory Switch({
@@ -30,6 +40,8 @@ abstract class Switch with _$Switch implements IXmlSerializable {
         SwitchState deviceLock,
   }) = _Switch;
 
+  /// @nodoc
+  @internal
   factory Switch.fromXmlElement(XmlElement element) =>
       _$_$_SwitchFromXmlElement(element);
 }

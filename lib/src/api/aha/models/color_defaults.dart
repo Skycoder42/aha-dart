@@ -10,13 +10,22 @@ import 'temperature_defaults.dart';
 part 'color_defaults.freezed.dart';
 part 'color_defaults.g.dart';
 
+/// A collection of default HSV colors to choose from for color control devices.
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class ColorDefaults with _$ColorDefaults implements IXmlConvertible {
+  /// @nodoc
+  @internal
   static const elementName = 'colordefaults';
 
+  /// @nodoc
+  @internal
   static const invalid = ColorDefaults();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @xml.XmlRootElement(name: ColorDefaults.elementName)
   @With.fromString(r'_$_$_ColorDefaultsXmlSerializableMixin')
@@ -29,6 +38,8 @@ abstract class ColorDefaults with _$ColorDefaults implements IXmlConvertible {
         TemperatureDefaults temperatureDefaults,
   }) = _ColorDefaults;
 
+  /// @nodoc
+  @internal
   factory ColorDefaults.fromXmlElement(XmlElement element) =>
       _$_$_ColorDefaultsFromXmlElement(element);
 }

@@ -5,7 +5,3 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.chopper.dart"
     - "**/*.freezed.dart"
-
-linter:
-  rules:
-    public_member_api_docs: false

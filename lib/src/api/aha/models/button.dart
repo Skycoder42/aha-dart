@@ -8,11 +8,18 @@ import 'timestamp.dart';
 part 'button.freezed.dart';
 part 'button.g.dart';
 
+/// Status information about a button device
+///
+/// {@macro aha_reference}
 @Freezed(makeCollectionsUnmodifiable: false)
 @xml.XmlSerializable()
 abstract class Button with _$Button implements IXmlSerializable {
+  /// @nodoc
+  @internal
   static const invalid = Button();
 
+  /// @nodoc
+  @internal
   @xml.XmlSerializable(createMixin: true)
   @With.fromString(r'_$_$_ButtonXmlSerializableMixin')
   const factory Button({
@@ -24,6 +31,8 @@ abstract class Button with _$Button implements IXmlSerializable {
     @xml.XmlElement() String? name,
   }) = _Button;
 
+  /// @nodoc
+  @internal
   factory Button.fromXmlElement(XmlElement element) =>
       _$_$_ButtonFromXmlElement(element);
 }

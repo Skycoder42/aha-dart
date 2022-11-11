@@ -1,31 +1,42 @@
 import 'package:chopper/chopper.dart';
+import 'package:meta/meta.dart';
 
 import 'combined_converter.dart';
 
-typedef FromTextFactory<T> = T Function(String);
-
-class UnexpectedNullableResponse extends UnsupportedError {
+/// An error that indicated that the response contains an `inval` value where
+/// no such value is allowed.
+class UnexpectedNullableResponse implements Exception {
+  /// The type that the response should have been converted to.
   final Type type;
 
-  UnexpectedNullableResponse(this.type)
-      : super(
-          'Response has "inval" value which indicates a null response, '
-          'but response type $type is not nullable!',
-        );
+  /// Default constructor.
+  UnexpectedNullableResponse(this.type);
+
+  @override
+  String toString() =>
+      'Response has "inval" value which indicates a null response, '
+      'but response type $type does not allow invalid/null values!';
 }
 
+/// @nodoc
+@internal
+typedef FromTextFactory<T> = T Function(String);
+
+/// @nodoc
+@internal
 class TextConverter extends CombinableConverter {
   static const _invalidValue = 'inval';
 
   static const _textContentType = 'text/plain';
 
   final _fromTextFactories = <Type, FromTextFactory<Object>>{
-    String: identity,
+    String: _identity,
     int: int.parse,
     double: double.parse,
     bool: _boolFromString,
   };
 
+  /// @nodoc
   void registerResponseConverter<T extends Object>(
     FromTextFactory<T> converter,
   ) =>
@@ -81,6 +92,8 @@ class TextConverter extends CombinableConverter {
     return factory;
   }
 }
+
+T _identity<T>(T t) => t;
 
 bool _boolFromString(String s) {
   switch (s.toLowerCase()) {
