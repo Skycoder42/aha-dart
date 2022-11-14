@@ -1,3 +1,5 @@
+export 'package:enum_flag/enum_flag.dart';
+
 export 'src/api/aha/aha_service.dart';
 export 'src/api/aha/models/alert.dart';
 export 'src/api/aha/models/avm_button.dart';

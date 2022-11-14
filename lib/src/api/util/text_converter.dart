@@ -84,12 +84,12 @@ class TextConverter extends CombinableConverter {
   }
 
   FromTextFactory<T> _getFactory<T>() {
-    final factory = _fromTextFactories[T] as FromTextFactory<T>?;
+    final factory = _fromTextFactories[T];
     if (factory == null) {
       throw ConversionNotSupported(T, 'response');
     }
 
-    return factory;
+    return factory as FromTextFactory<T>;
   }
 }
 

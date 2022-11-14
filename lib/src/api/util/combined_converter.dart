@@ -69,6 +69,10 @@ class CombinedConverter implements Converter {
   FutureOr<Response<BodyType>> convertResponse<BodyType, InnerType>(
     Response response,
   ) {
+    if (BodyType == _getType<void>()) {
+      return response as Response<BodyType>;
+    }
+
     final responseContentType =
         response.headers[contentTypeKey]?.split(';').first;
 
@@ -84,3 +88,5 @@ class CombinedConverter implements Converter {
     throw ConversionNotSupported(BodyType, 'response');
   }
 }
+
+Type _getType<T>() => T;

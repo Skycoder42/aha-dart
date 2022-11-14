@@ -108,7 +108,7 @@ class XmlConverter extends CombinableConverter {
       applyHeader(request, contentTypeKey, _xmlContentType);
 
   FromXmlFactory<T> _getFactory<T>(XmlName rootElementName) {
-    final factory = _xmlFactories[T] as _XmlConverter<T>?;
+    final factory = _xmlFactories[T];
     if (factory == null) {
       throw ConversionNotSupported(T, 'response');
     }
@@ -117,6 +117,6 @@ class XmlConverter extends CombinableConverter {
       throw InvalidRootElement(T, factory.allowedElementNames, rootElementName);
     }
 
-    return factory.fromXmlElement;
+    return factory.fromXmlElement as FromXmlFactory<T>;
   }
 }
