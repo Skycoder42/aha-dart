@@ -61,7 +61,7 @@ class AhaClient {
             scheme: 'https',
             host: hostName,
             port: port,
-          ).toString(),
+          ),
           converter: CombinedConverter([
             XmlConverter()
               ..registerResponseConverter(
