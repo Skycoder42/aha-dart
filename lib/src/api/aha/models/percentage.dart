@@ -32,7 +32,7 @@ abstract class Percentage with _$Percentage implements IXmlSerializable {
     @xml.XmlText()
     @Default(Percentage._invalidPercentageValue)
     @visibleForOverriding
-        int rawValue,
+    int rawValue,
   }) = _Percentage;
 
   /// @nodoc

@@ -26,10 +26,10 @@ abstract class NextChange with _$NextChange implements IXmlSerializable {
   const factory NextChange({
     @xml.XmlElement(name: 'endperiod')
     @Default(Timestamp.deactivated)
-        Timestamp endPeriod,
+    Timestamp endPeriod,
     @xml.XmlElement(name: 'tchange')
     @Default(HkrTemperature.invalid)
-        HkrTemperature tChange,
+    HkrTemperature tChange,
   }) = _NextChange;
 
   /// @nodoc

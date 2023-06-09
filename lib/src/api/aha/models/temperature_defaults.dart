@@ -28,7 +28,7 @@ abstract class TemperatureDefaults
   const factory TemperatureDefaults({
     @xml.XmlElement(name: 'temp', isSelfClosing: true)
     @Default(<Temp>[])
-        List<Temp> temperatures,
+    List<Temp> temperatures,
   }) = _TemperatureDefaults;
 
   /// @nodoc

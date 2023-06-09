@@ -28,7 +28,7 @@ abstract class HsColor with _$HsColor implements IXmlSerializable {
     @xml.XmlElement() @Default(Name.invalid) Name name,
     @xml.XmlElement(name: 'color', isSelfClosing: true)
     @Default(<Color>[])
-        List<Color> colors,
+    List<Color> colors,
   }) = _HsColor;
 
   /// @nodoc

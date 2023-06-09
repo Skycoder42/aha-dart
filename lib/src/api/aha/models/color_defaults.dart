@@ -32,10 +32,10 @@ abstract class ColorDefaults with _$ColorDefaults implements IXmlConvertible {
   const factory ColorDefaults({
     @xml.XmlElement(name: 'hsdefaults')
     @Default(HsDefaults.invalid)
-        HsDefaults hsDefaults,
+    HsDefaults hsDefaults,
     @xml.XmlElement(name: 'temperaturedefaults')
     @Default(TemperatureDefaults.invalid)
-        TemperatureDefaults temperatureDefaults,
+    TemperatureDefaults temperatureDefaults,
   }) = _ColorDefaults;
 
   /// @nodoc

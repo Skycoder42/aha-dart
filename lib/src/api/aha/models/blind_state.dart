@@ -3,7 +3,6 @@
 /// The state of a blinds device.
 ///
 /// {@macro aha_reference}
-
 enum BlindState {
   open,
 

@@ -62,7 +62,7 @@ abstract class Alert with _$Alert implements IXmlSerializable {
     @xml.XmlElement() @Default(AlertState.unknown) AlertState state,
     @xml.XmlElement(name: 'lastalertchgtimestamp')
     @Default(Timestamp.deactivated)
-        Timestamp lastAlertChgTimestamp,
+    Timestamp lastAlertChgTimestamp,
   }) = _Alert;
 
   /// @nodoc

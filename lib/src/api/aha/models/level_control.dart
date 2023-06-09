@@ -27,7 +27,7 @@ abstract class LevelControl with _$LevelControl implements IXmlSerializable {
     @xml.XmlElement() @Default(Level.invalid) Level level,
     @xml.XmlElement(name: 'levelpercentage')
     @Default(Percentage.invalid)
-        Percentage levelPercentage,
+    Percentage levelPercentage,
   }) = _LevelControl;
 
   /// @nodoc

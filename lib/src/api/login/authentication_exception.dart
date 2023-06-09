@@ -16,7 +16,6 @@ class AuthenticationException
   factory AuthenticationException.invalidStatus(
     /// The HTTP status code of the failed request
     int statusCode, [
-
     /// The error response body, if one was given.
     Object? error,
   ]) = _Status;

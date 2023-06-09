@@ -27,7 +27,7 @@ abstract class Button with _$Button implements IXmlSerializable {
     @xml.XmlAttribute() String? identifier,
     @xml.XmlElement(name: 'lastpressedtimestamp')
     @Default(Timestamp.deactivated)
-        Timestamp lastPressedTimestamp,
+    Timestamp lastPressedTimestamp,
     @xml.XmlElement() String? name,
   }) = _Button;
 

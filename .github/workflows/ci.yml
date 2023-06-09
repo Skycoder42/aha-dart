@@ -3,7 +3,6 @@ name: CI/CD
 on:
   workflow_dispatch:
   push:
-  pull_request:
 
 jobs:
   ci:
@@ -12,13 +11,3 @@ jobs:
     with:
       buildRunner: true
       unitTestPaths: ""
-
-  # cd:
-  #   name: CD
-  #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
-  #   needs:
-  #     - ci
-  #   with:
-  #     buildRunner: true
-  #   secrets:
-  #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}

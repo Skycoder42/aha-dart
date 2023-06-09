@@ -50,7 +50,7 @@ abstract class HkrTemperature
     @xml.XmlText()
     @visibleForOverriding
     @Default(HkrTemperature._invalidValue)
-        int rawValue,
+    int rawValue,
   }) = _HkrTemperature;
 
   /// @nodoc

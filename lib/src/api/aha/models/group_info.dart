@@ -28,7 +28,7 @@ abstract class GroupInfo with _$GroupInfo implements IXmlSerializable {
     @xml.XmlElement(name: 'members')
     @visibleForOverriding
     @Default('')
-        String rawMembers,
+    String rawMembers,
   }) = _GroupInfo;
 
   /// @nodoc

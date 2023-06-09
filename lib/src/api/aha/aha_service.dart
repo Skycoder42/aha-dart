@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs
 
-import 'package:chopper/chopper.dart';
+import 'package:chopper/chopper.dart' hide Level;
 import 'package:color/color.dart';
 import 'package:meta/meta.dart';
 

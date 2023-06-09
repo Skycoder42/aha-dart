@@ -46,7 +46,7 @@ abstract class ColorControl with _$ColorControl implements IXmlSerializable {
     @xml.XmlAttribute(name: 'supported_modes') @Default(0) int supportedModes,
     @xml.XmlAttribute(name: 'current_mode')
     @Default(ColorControlMode.unknown)
-        ColorControlMode currentMode,
+    ColorControlMode currentMode,
 
     /// @nodoc
     @xml.XmlElement() @visibleForOverriding String? hue,

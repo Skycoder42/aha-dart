@@ -39,7 +39,7 @@ abstract class DeviceList with _$DeviceList implements IXmlConvertible {
     /// @nodoc
     @xml.XmlElement(name: Device.groupElementName)
     @visibleForOverriding
-        List<Device>? rawGroups,
+    List<Device>? rawGroups,
   }) = _DeviceList;
 
   /// @nodoc

@@ -36,11 +36,11 @@ abstract class SessionInfo with _$SessionInfo implements IXmlConvertible {
     @xml.XmlElement(name: 'BlockTime')
     @visibleForOverriding
     @Default(0)
-        int blockTimeRaw,
+    int blockTimeRaw,
     @xml.XmlElement(name: 'Users') @Default(Users.empty) Users users,
     @xml.XmlElement(name: 'Rights')
     @Default(AccessRights.empty)
-        AccessRights accessRights,
+    AccessRights accessRights,
   }) = _SessionInfo;
 
   /// @nodoc

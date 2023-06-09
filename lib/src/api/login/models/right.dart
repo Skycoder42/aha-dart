@@ -72,7 +72,7 @@ abstract class AccessRights with _$AccessRights implements IXmlSerializable {
     /// @nodoc
     @visibleForOverriding
     @xml.XmlElement(name: 'Access')
-        List<AccessLevel>? accesses,
+    List<AccessLevel>? accesses,
   }) = _AccessRights;
 
   /// @nodoc

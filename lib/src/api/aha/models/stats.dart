@@ -52,7 +52,7 @@ abstract class Stats<TUnit extends StatsUnit>
     @xml.XmlAttribute(name: 'grid')
     @visibleForOverriding
     @Default(0)
-        int rawGrid,
+    int rawGrid,
 
     /// @nodoc
     @xml.XmlText() @visibleForOverriding @Default('') String rawValues,
@@ -92,15 +92,15 @@ abstract class Stats<TUnit extends StatsUnit>
     }
 
     switch (TUnit) {
-      case StatsUnitCelsius:
+      case const (StatsUnitCelsius):
         return intValue / 10;
-      case StatsUnitVolt:
+      case const (StatsUnitVolt):
         return intValue / 1000;
-      case StatsUnitWatt:
+      case const (StatsUnitWatt):
         return intValue / 100;
-      case StatsUnitWattHours:
+      case const (StatsUnitWattHours):
         return intValue.toDouble();
-      case StatsUnitPercent:
+      case const (StatsUnitPercent):
         return intValue / 100;
       default:
         throw StateError('Unknown unit type $TUnit');

@@ -107,7 +107,7 @@ abstract class Device with _$Device implements IXmlConvertible {
     // groups specific, all before is identical
     @xml.XmlElement(name: 'groupinfo')
     @Default(GroupInfo.invalid)
-        GroupInfo groupInfo,
+    GroupInfo groupInfo,
   }) = DeviceGroup;
 
   /// @nodoc

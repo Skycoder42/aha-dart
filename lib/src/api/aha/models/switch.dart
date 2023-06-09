@@ -37,7 +37,7 @@ abstract class Switch with _$Switch implements IXmlSerializable {
     @xml.XmlElement() @Default(SwitchState.invalid) SwitchState lock,
     @xml.XmlElement(name: 'devicelock')
     @Default(SwitchState.invalid)
-        SwitchState deviceLock,
+    SwitchState deviceLock,
   }) = _Switch;
 
   /// @nodoc

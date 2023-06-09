@@ -55,34 +55,34 @@ abstract class Hkr with _$Hkr implements IXmlSerializable {
   const factory Hkr({
     @xml.XmlElement(name: 'tist')
     @Default(HkrTemperature.invalid)
-        HkrTemperature tIst,
+    HkrTemperature tIst,
     @xml.XmlElement(name: 'tsoll')
     @Default(HkrTemperature.invalid)
-        HkrTemperature tSoll,
+    HkrTemperature tSoll,
     @xml.XmlElement() @Default(HkrTemperature.invalid) HkrTemperature absenk,
     @xml.XmlElement() @Default(HkrTemperature.invalid) HkrTemperature komfort,
     @xml.XmlElement() @Default(SwitchState.invalid) SwitchState lock,
     @xml.XmlElement(name: 'devicelock')
     @Default(SwitchState.invalid)
-        SwitchState deviceLock,
+    SwitchState deviceLock,
     @xml.XmlElement(name: 'errorcode')
     @Default(HkrError.noError)
-        HkrError errorCode,
+    HkrError errorCode,
     @xml.XmlElement(name: 'windowopenactiv')
     @Default(false)
-        bool windowOpenActive,
+    bool windowOpenActive,
     @xml.XmlElement(name: 'windowopenactiveendtime')
     @Default(Timestamp.deactivated)
-        Timestamp windowOpenActiveEndTime,
+    Timestamp windowOpenActiveEndTime,
     @xml.XmlElement(name: 'boostactive') @Default(false) bool boostActive,
     @xml.XmlElement(name: 'boostactiveendtime')
     @Default(Timestamp.deactivated)
-        Timestamp boostActiveEndTime,
+    Timestamp boostActiveEndTime,
     @xml.XmlElement(name: 'batterylow') @Default(false) bool batteryLow,
     @xml.XmlElement() @Default(Percentage.invalid) Percentage battery,
     @xml.XmlElement(name: 'nextchange')
     @Default(NextChange.invalid)
-        NextChange nextChange,
+    NextChange nextChange,
     @xml.XmlElement(name: 'summeractive') @Default(false) bool summerActive,
     @xml.XmlElement(name: 'holidayactive') @Default(false) bool holidayActive,
   }) = _Hkr;

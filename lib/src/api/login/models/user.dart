@@ -28,7 +28,7 @@ abstract class User with _$User implements IXmlSerializable {
     @visibleForOverriding
     @xml.XmlAttribute(name: 'last')
     @Default(false)
-        bool? lastRaw,
+    bool? lastRaw,
   }) = _User;
 
   /// @nodoc

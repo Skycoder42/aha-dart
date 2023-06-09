@@ -46,7 +46,7 @@ abstract class State with _$State implements IXmlConvertible {
   const factory State({
     @xml.XmlAttribute()
     @Default(SubscriptionState.registrationNotRunning)
-        SubscriptionState code,
+    SubscriptionState code,
     @xml.XmlElement(name: 'latestain') String? latestAin,
   }) = _State;
 

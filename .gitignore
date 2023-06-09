@@ -24,3 +24,5 @@ doc/api/
 *.chopper.dart
 *.freezed.dart
 *.g.dart
+
+*.log
