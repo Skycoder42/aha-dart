@@ -1,0 +1,15 @@
+targets:
+  freezed_only:
+    builders:
+      freezed:freezed:
+        enabled: true
+      xml_serializable:xml_serializable:
+        enabled: false
+      chopper_generator:chopper_generator:
+        enabled: false
+  $default:
+    dependencies:
+      - aha_client:freezed_only
+    builders:
+      freezed:freezed:
+        enabled: false
